@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import os, sys
-import config, pickler
+import config, pickler, sender
 
 def get_resource_path(name):
     return os.path.join(os.path.expanduser('~'), '.needtoknow/cache/%s.pickle' % name)
@@ -52,9 +52,22 @@ def main():
         if feeders[f] is not None:
             feeders[f].add(s, dict(feeds.items(s)))
 
+    out = sender.Sender(conf)
+    try:
+        out.connect()
+    except Exception as e:
+        print >>sys.stderr, 'Failed to connect to mail server: %s' % e
+        return -1
+
     for f in filter(None, feeders.values()):
-        for a in f:
-            print a
+        for article in f:
+            try:
+                out.send(article[0], article[1], article[2])
+            except Exception as e:
+                print >>sys.stderr, 'Failed to send update for %s: %s' % (article[0], e)
+                return -1
+
+    out.disconnect()
 
     # Commit resource changes.
     for f in feeders:
