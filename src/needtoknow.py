@@ -52,6 +52,10 @@ def main():
         if feeders[f] is not None:
             feeders[f].add(dict(feeds.items(s)))
 
+    for f in filter(None, feeders.values()):
+        for a in f:
+            print a
+
     return 0
 
 if __name__ == '__main__':
