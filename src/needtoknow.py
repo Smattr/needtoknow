@@ -12,7 +12,6 @@ def construct_feeder(name):
 
     try:
         mod = __import__(name)
-        feeder = mod.Feeder
     except Exception as e:
         print >>sys.stderr, 'Warning: failed to import feeder %s: %s' % (name, e)
         return None
@@ -23,7 +22,7 @@ def construct_feeder(name):
     else:
         resource = {}
 
-    return (feeder, resource)
+    return mod.Feeder(resource)
 
 def main():
     try:
