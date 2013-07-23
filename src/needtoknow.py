@@ -3,6 +3,9 @@
 import os, sys
 import config, pickler
 
+def get_resource_path(name):
+    return os.path.join(os.path.expanduser('~'), '.needtoknow/cache/%s.pickle' % name)
+
 _PATH_APPENDED = False
 def construct_feeder(name):
     global _PATH_APPENDED
@@ -16,7 +19,7 @@ def construct_feeder(name):
         print >>sys.stderr, 'Warning: failed to import feeder %s: %s' % (name, e)
         return None
 
-    respath = os.path.join(os.path.expanduser('~'), '.needtoknow/cache/%s.pickle' % name)
+    respath = get_resource_path(name)
     if os.path.exists(respath):
         resource = pickler.restore(respath)
     else:
