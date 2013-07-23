@@ -12,8 +12,10 @@ class Feeder(base.Feeder):
                 old = []
             response = urllib2.urlopen(url)
             new = nltk.clean_html(response.read()).splitlines()
-            yield 'Changes to %(url)s:\n\n%(content)s' % {
-                'url':url,
-                'content':'\n'.join(list(difflib.unified_diff(old, new, lineterm=''))),
-            }
+            content = '\n'.join(list(difflib.unified_diff(old, new, lineterm='')))
+            if content:
+                yield 'Changes to %(url)s:\n\n%(content)s' % {
+                    'url':url,
+                    'content':content,
+                }
             self.resource[url] = '\n'.join(new)
