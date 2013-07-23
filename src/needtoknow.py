@@ -49,6 +49,9 @@ def main():
             if f not in feeders:
                 feeders[f] = construct_feeder(f)
 
+        if feeders[f] is not None:
+            feeders[f].add(dict(feeds.items(s)))
+
     return 0
 
 if __name__ == '__main__':
