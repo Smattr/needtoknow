@@ -1,7 +1,29 @@
 #!/usr/bin/env python
 
 import os, sys
-import config
+import config, pickler
+
+_PATH_APPENDED = False
+def construct_feeder(name):
+    global _PATH_APPENDED
+    if not _PATH_APPENDED:
+        sys.path.insert(0, os.path.join(os.curdir, 'feeders'))
+        _PATH_APPENDED = True
+
+    try:
+        mod = __import__(name)
+        feeder = mod.Feeder
+    except Exception as e:
+        print >>sys.stderr, 'Warning: failed to import feeder %s: %s' % (name, e)
+        return None
+
+    respath = os.path.join(os.path.expanduser('~'), '.needtoknow/cache/%s.pickle' % name)
+    if os.path.exists(respath):
+        resource = pickler.restore(respath)
+    else:
+        resource = {}
+
+    return (feeder, resource)
 
 def main():
     try:
@@ -16,16 +38,14 @@ def main():
         print >>sys.stderr, 'Failed to parse feeds: %s' % e
         return -1
 
-    print conf
+    feeders = {}
 
-    return 0
-
-    sys.path.insert(0, os.path.join(os.curdir, 'feeders'))
-    for i in ['diff', 'htmldiff', 'rss']:
-        j = __import__(i)
-    f = j.Feeder({}, url='https://www.blah.com')
-    for i in f:
-        print i
+    for s in feeds.sections():
+        if feeds.has_option(s, 'feeder') and \
+                feeds.get(s, 'feeder') not in feeders:
+            f = feeds.get(s, 'feeder')
+            if f not in feeders:
+                feeders = construct_feeder(f)
 
     return 0
 
