@@ -56,6 +56,12 @@ def main():
         for a in f:
             print a
 
+    # Commit resource changes.
+    for f in feeders:
+        if feeders[f] is not None:
+            respath = get_resource_path(f)
+            pickler.save(respath, feeders[f].resource)
+
     return 0
 
 if __name__ == '__main__':
