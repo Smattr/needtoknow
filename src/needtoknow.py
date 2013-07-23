@@ -50,7 +50,7 @@ def main():
                 feeders[f] = construct_feeder(f)
 
         if feeders[f] is not None:
-            feeders[f].add(dict(feeds.items(s)))
+            feeders[f].add(s, dict(feeds.items(s)))
 
     for f in filter(None, feeders.values()):
         for a in f:

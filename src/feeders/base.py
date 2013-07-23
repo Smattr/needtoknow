@@ -1,10 +1,10 @@
 class Feeder(object):
     def __init__(self, resource):
         self.resource = resource
-        self.items = []
+        self.feeds = {}
 
-    def add(self, item):
-        self.items.append(item)
+    def add(self, name, item):
+        self.feeds[name] = item
 
     def __iter__(self):
         raise NotImplementedError

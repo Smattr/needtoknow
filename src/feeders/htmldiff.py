@@ -3,7 +3,7 @@ import difflib, urllib2
 
 class Feeder(base.Feeder):
     def __iter__(self):
-        for i in self.items:
+        for n, i in self.feeds.items():
             assert 'url' in i
             url = i['url']
             if url in self.resource:
@@ -14,8 +14,5 @@ class Feeder(base.Feeder):
             new = response.read().splitlines()
             content = '\n'.join(list(difflib.unified_diff(old, new, lineterm='')))
             if content:
-                yield 'Changes to %(url)s:\n\n%(content)s' % {
-                    'url':url,
-                    'content':content,
-                }
+                yield (n, '%s changes' % url, content)
             self.resource[url] = '\n'.join(new)
