@@ -44,7 +44,7 @@ def main():
                 feeds.get(s, 'feeder') not in feeders:
             f = feeds.get(s, 'feeder')
             if f not in feeders:
-                feeders = construct_feeder(f)
+                feeders[f] = construct_feeder(f)
 
     return 0
 
