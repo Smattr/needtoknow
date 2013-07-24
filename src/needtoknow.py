@@ -10,7 +10,7 @@ _PATH_APPENDED = False
 def construct_feeder(name):
     global _PATH_APPENDED
     if not _PATH_APPENDED:
-        sys.path.insert(0, os.path.join(os.curdir, 'feeders'))
+        sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'feeders'))
         _PATH_APPENDED = True
 
     try:
