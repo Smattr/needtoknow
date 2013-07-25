@@ -11,7 +11,7 @@ class Feeder(base.Feeder):
             else:
                 old = []
             response = urllib2.urlopen(url)
-            new = response.read().splitlines()
+            new = response.read().strip().splitlines()
             content = '\n'.join(list(difflib.unified_diff(old, new, lineterm='')))
             if content:
                 yield (n, '%s changes' % url, content)
