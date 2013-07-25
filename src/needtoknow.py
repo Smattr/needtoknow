@@ -60,11 +60,11 @@ def main():
         return -1
 
     for f in filter(None, feeders.values()):
-        for article in f:
+        for entry in f:
             try:
-                out.send(article[0], article[1], article[2])
+                out.send(entry)
             except Exception as e:
-                print >>sys.stderr, 'Failed to send update for %s: %s' % (article[0], e)
+                print >>sys.stderr, 'Failed to send update for %s: %s' % (entry.name, e)
                 return -1
 
     out.disconnect()

@@ -1,4 +1,5 @@
 import smtplib
+from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 class Sender(object):
@@ -23,10 +24,15 @@ class Sender(object):
                 pass
         self.conn = None
 
-    def send(self, name, title, body):
+    def send(self, entry):
         assert self.conn is not None
-        m = MIMEText(body, 'plain', _charset='utf-8')
+        if entry.html:
+            m = MIMEMultipart('alternative')
+            part = MIMEText(entry.content, 'html', _charset='utf-8')
+            m.attach(part)
+        else:
+            m = MIMEText(entry.content, 'plain', _charset='utf-8')
         m['To'] = self.opts['to']
-        m['From'] = '%s <%s>' % (name, self.opts['from'])
-        m['Subject'] = title
+        m['From'] = '%s <%s>' % (entry.name, self.opts['from'])
+        m['Subject'] = entry.subject
         self.conn.sendmail(self.opts['from'], self.opts['to'], m.as_string())

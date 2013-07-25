@@ -10,6 +10,6 @@ class Feeder(base.Feeder):
             new = feedparser.parse(url)
             for e in new.entries:
                 if e.id not in seen:
-                    yield (n, e.title, e.description)
+                    yield base.Entry(n, e.title, e.description, html=True)
                     seen.add(e.id)
             self.resource[url] = seen
