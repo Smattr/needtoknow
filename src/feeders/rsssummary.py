@@ -11,12 +11,13 @@ class Feeder(base.Feeder):
             for e in entries:
                 id = rsscommon.get_id(e)
                 if id not in seen:
-                    body += '<p>%(title)s<br/><a href="%(link)s">%(link)s</a></p>' % {
+                    body += '<p><b>%(title)s</b><br/><font size="-1"><a href="%(link)s">%(link)s</a></font></p>' % {
                         'title':e.title,
                         'link':e.link,
                     }
                     if i.get('description', 'no').lower() == 'yes':
                         body += e.description
+                    body += '<hr/>'
                     seen.add(id)
             if body:
                 yield base.Entry(n, '%s summary' % n, body, html=True)
