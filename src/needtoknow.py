@@ -43,11 +43,9 @@ def main():
     feeders = {}
 
     for s in feeds.sections():
-        if feeds.has_option(s, 'feeder') and \
-                feeds.get(s, 'feeder') not in feeders:
-            f = feeds.get(s, 'feeder')
-            if f not in feeders:
-                feeders[f] = construct_feeder(f)
+        f = feeds.get(s, 'feeder')
+        if f not in feeders:
+            feeders[f] = construct_feeder(f)
 
         if feeders[f] is not None:
             feeders[f].add(s, dict(feeds.items(s)))
