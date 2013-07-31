@@ -47,7 +47,9 @@ def main():
         if f not in feeders:
             feeders[f] = construct_feeder(f)
 
-        if feeders[f] is not None:
+        if feeders[f] is None:
+            print >>sys.stderr, 'Warning: No feeder named %s (referenced by %s).' % (f, s)
+        else:
             feeders[f].add(s, dict(feeds.items(s)))
 
     out = sender.Sender(conf)
