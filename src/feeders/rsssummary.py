@@ -16,7 +16,7 @@ class Feeder(base.Feeder):
                         'link':e.link,
                     }
                     if i.get('description', 'no').lower() == 'yes':
-                        body += e.description
+                        body += rsscommon.get_content(e)
                     body += '<hr/>'
                     seen.add(id)
             if body:

@@ -20,7 +20,7 @@ class Feeder(base.Feeder):
                         # See if the page is available.
                         urllib2.urlopen(e.link)
                         # No 503 :)
-                        yield base.Entry(n, e.title, e.description, html=True)
+                        yield base.Entry(n, e.title, rsscommon.get_content(e), html=True)
                         seen.add(id)
                     except:
                         # 503 :(

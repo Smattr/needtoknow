@@ -13,3 +13,9 @@ def get_id(entry):
         return entry.id
     except:
         return entry.title
+
+def get_content(entry):
+    try:
+        return entry.content[0].value
+    except:
+        return entry.description
