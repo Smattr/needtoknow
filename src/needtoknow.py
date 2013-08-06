@@ -59,13 +59,19 @@ def main():
         print >>sys.stderr, 'Failed to connect to mail server: %s' % e
         return -1
 
-    for f in filter(None, feeders.values()):
-        for entry in f:
-            try:
-                out.send(entry)
-            except Exception as e:
-                print >>sys.stderr, 'Failed to send update for %s: %s' % (entry.name, e)
-                return -1
+    for f in feeders:
+        if feeders[f] is None:
+            # We failed to load this feeder.
+            continue
+        try:
+            for entry in feeders[f]:
+                try:
+                    out.send(entry)
+                except Exception as e:
+                    print >>sys.stderr, 'Failed to send update for %s: %s' % (entry.name, e)
+                    return -1
+        except Exception as e:
+            print >>sys.stderr, 'Warning: feeder %s threw exception: %s' % (f, e)
 
     out.disconnect()
 
