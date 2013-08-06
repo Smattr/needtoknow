@@ -12,7 +12,8 @@ class Feeder(base.Feeder):
                 old = []
             response = urllib2.urlopen(url)
             new = response.read().strip().splitlines()
-            content = '\n'.join(list(difflib.unified_diff(old, new, lineterm='')))
+            content = '\n'.join(list(difflib.unified_diff(old, new,
+                fromfile=url, tofile=url, lineterm='')))
             if content:
                 yield base.Entry(n, '%s changes' % url, content)
             self.resource[url] = '\n'.join(new)
