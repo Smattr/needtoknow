@@ -15,6 +15,6 @@ class Feeder(base.Feeder):
                            'title':e.title,
                            'link':e.link,
                            'content':rsscommon.get_content(e),
-                       }, html=True)
+                       }, date=e.date, html=True)
                     seen.add(id)
             self.resource[url] = seen

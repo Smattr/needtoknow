@@ -19,3 +19,6 @@ def get_content(entry):
         return entry.content[0].value
     except:
         return entry.description
+
+def get_date(entry):
+    return entry.date

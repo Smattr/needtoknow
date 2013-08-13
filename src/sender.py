@@ -35,4 +35,6 @@ class Sender(object):
         m['To'] = self.opts['to']
         m['From'] = '%s <%s>' % (entry.name, self.opts['from'])
         m['Subject'] = '[%s] %s' % (entry.name, entry.subject)
+        if entry.date:
+            m['Date'] = entry.date
         self.conn.sendmail(self.opts['from'], self.opts['to'], m.as_string())
