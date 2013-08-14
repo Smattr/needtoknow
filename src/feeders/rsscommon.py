@@ -18,7 +18,13 @@ def get_content(entry):
     try:
         return entry.content[0].value
     except:
-        return entry.description
+        try:
+            return entry.description
+        except:
+            return ''
 
 def get_date(entry):
-    return entry.date
+    try:
+        return entry.date
+    except:
+        return None
