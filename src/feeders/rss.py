@@ -6,15 +6,21 @@ class Feeder(base.Feeder):
             assert 'url' in i
             url = i['url']
             seen = self.resource.get(url, set())
-            entries = rsscommon.get_entries(url)
-            for e in entries:
-                id = rsscommon.get_id(e)
-                if id not in seen:
-                    yield base.Entry(n, e.title, \
-                       '<p><b>%(title)s</b><br/><font size="-1"><a href="%(link)s">%(link)s</a></font></p>%(content)s' % {
-                           'title':e.title,
-                           'link':e.link,
-                           'content':rsscommon.get_content(e),
-                       }, date=e.date, html=True)
-                    seen.add(id)
-            self.resource[url] = seen
+            try:
+                entries = rsscommon.get_entries(url)
+                for e in entries:
+                    id = rsscommon.get_id(e)
+                    if id not in seen:
+                        yield base.Entry(n, e.title, \
+                           '<p><b>%(title)s</b><br/><font size="-1"><a href="%(link)s">%(link)s</a></font></p>%(content)s' % {
+                               'title':e.title,
+                               'link':e.link,
+                               'content':rsscommon.get_content(e),
+                           }, date=rsscommon.get_date(e), html=True)
+                        seen.add(id)
+                self.resource[url] = seen
+            except Exception as e:
+                raise Exception('Error from feed %(name)s: %(err)s' % {
+                    'name':n,
+                    'err':e,
+                })

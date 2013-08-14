@@ -12,8 +12,14 @@ class Feeder(base.Feeder):
             else:
                 old = []
                 oldurl = '/dev/null'
-            response = urllib2.urlopen(url)
-            new = response.read().strip().splitlines()
+            try:
+                response = urllib2.urlopen(url)
+                new = response.read().strip().splitlines()
+            except Exception as e:
+                raise Exception('Error while loading %(url)s: %(err)s' % {
+                    'url':url,
+                    'err':e,
+                })
             content = '\n'.join(list(difflib.unified_diff(old, new,
                 fromfile=oldurl, tofile=url, lineterm='')))
             if content:
