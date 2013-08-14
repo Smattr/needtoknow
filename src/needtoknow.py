@@ -71,7 +71,7 @@ def main():
                     print >>sys.stderr, 'Failed to send update for %s: %s' % (entry.name, e)
                     return -1
         except Exception as e:
-            print >>sys.stderr, 'Warning: feeder %s threw exception: %s' % (f, e)
+            print >>sys.stderr, 'Warning: feeder \'%s\' threw exception: %s' % (f, e)
 
     out.disconnect()
 
