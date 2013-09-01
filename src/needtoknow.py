@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os, sys
+import argparse, os, sys
 import config, pickler, sender
 
 def get_resource_path(name):
@@ -28,6 +28,17 @@ def construct_feeder(name):
     return mod.Feeder(resource)
 
 def main():
+    parser = argparse.ArgumentParser('Monitor RSS and other feeds')
+    parser.add_argument('--disable', '-d', action='append', default=[],
+        help='disable a particular feeder by name')
+    parser.add_argument('--enable', '-e', action='append', default=[],
+        help='enable a particular feeder by name')
+    parser.add_argument('--exclude', '-x', action='append', default=[],
+        help='exclude a particular feed by name')
+    parser.add_argument('--include', '-i', action='append', default=[],
+        help='include a particular feed by name')
+    opts = parser.parse_args()
+
     try:
         conf = config.get_config()
     except Exception as e:
@@ -50,7 +61,8 @@ def main():
         if feeders[f] is None:
             print >>sys.stderr, 'Warning: No feeder named %s (referenced by %s).' % (f, s)
         else:
-            feeders[f].add(s, dict(feeds.items(s)))
+            if s in opts.include or (opts.include == [] and s not in opts.exclude):
+                feeders[f].add(s, dict(feeds.items(s)))
 
     out = sender.Sender(conf)
     try:
@@ -62,6 +74,8 @@ def main():
     for f in feeders:
         if feeders[f] is None:
             # We failed to load this feeder.
+            continue
+        if f in opts.disable or (opts.enable != [] and f not in opts.enable):
             continue
         try:
             for entry in feeders[f]:
