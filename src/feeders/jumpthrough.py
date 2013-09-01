@@ -12,11 +12,15 @@ class Feeder(base.Feeder):
                 for e in entries:
                     id = rsscommon.get_id(e)
                     if id not in seen:
-                        resp = urllib2.urlopen(e.link)
-                        yield base.Entry(n, e.title, \
-                            resp.read(), \
-                            date=rsscommon.get_date(e), \
-                            html=True)
+                        try:
+                            resp = urllib2.urlopen(e.link)
+                            yield base.Entry(n, e.title, \
+                                resp.read(), \
+                                date=rsscommon.get_date(e), \
+                                html=True)
+                        except urllib2.HTTPError:
+                            # Suppress 404s from broken links.
+                            pass
                         seen.add(id)
                 self.resource[url] = seen
             except Exception as e:
