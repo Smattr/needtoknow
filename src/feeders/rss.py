@@ -12,10 +12,11 @@ class Feeder(base.Feeder):
                     id = rsscommon.get_id(e)
                     if id not in seen:
                         yield base.Entry(n, e.title, \
-                           '<p><b>%(title)s</b><br/><font size="-1"><a href="%(link)s">%(link)s</a></font></p>%(content)s' % {
+                           '<p><b>%(title)s</b><br/><font size="-1"><a href="%(link)s">%(link)s</a></font></p>%(content)s<a href="%(extralink)s">%(extralink)s</a>' % {
                                'title':e.title,
                                'link':e.link,
                                'content':rsscommon.get_content(e),
+                               'extralink':rsscommon.get_extra_link(e),
                            }, date=rsscommon.get_date(e), html=True)
                         seen.add(id)
                 self.resource[url] = seen

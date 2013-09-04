@@ -28,3 +28,10 @@ def get_date(entry):
         return entry.date
     except:
         return None
+
+def get_extra_link(entry):
+    # Some RSS feeds have more than one link.
+    try:
+        return entry.links[1].url
+    except:
+        return ''
