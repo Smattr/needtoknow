@@ -29,9 +29,14 @@ def get_date(entry):
     except:
         return None
 
-def get_extra_link(entry):
-    # Some RSS feeds have more than one link.
+def get_links(entry):
+    l = set()
     try:
-        return entry.links[1].url
+        l.add(entry.link)
     except:
-        return ''
+        pass
+    try:
+        map(lambda x: l.add(x.url), entry.links)
+    except:
+        pass
+    return l

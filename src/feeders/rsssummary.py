@@ -11,9 +11,10 @@ class Feeder(base.Feeder):
             for e in entries:
                 id = rsscommon.get_id(e)
                 if id not in seen:
-                    body += '<p><b>%(title)s</b><br/><font size="-1"><a href="%(link)s">%(link)s</a></font></p>' % {
+                    links = rsscommon.get_links(e)
+                    body += '<p><b>%(title)s</b><br/><font size="-1">%(links)s</font></p>' % {
                         'title':e.title,
-                        'link':e.link,
+                        'links':'<br/>'.join(map(lambda x: '<a href="%(link)s">%(link)s</a>' % {'link':x}, links)),
                     }
                     if i.get('description', 'no').lower() == 'yes':
                         body += rsscommon.get_content(e)
