@@ -1,4 +1,4 @@
-import base, rsscommon
+import base, re, rsscommon
 
 class Feeder(base.Feeder):
     def __iter__(self):
@@ -18,6 +18,8 @@ class Feeder(base.Feeder):
                     }
                     if i.get('description', 'no').lower() == 'yes':
                         body += rsscommon.get_content(e)
+                    if i.get('strip_images', 'no').lower() == 'yes':
+                        body = re.sub(r'<img.*?/>', '', body)
                     body += '<hr/>'
                     seen.add(id)
             if body:
