@@ -1,7 +1,3 @@
-# tl;dr
-
-An RSS-to-email gateway. Work in progress.
-
 # Once upon a time...
 
 I was a happy [Google Reader](http://www.google.com/reader) user. Then Google
