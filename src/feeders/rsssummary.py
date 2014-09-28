@@ -20,6 +20,12 @@ class Feeder(base.Feeder):
                         body += rsscommon.get_content(e)
                     if i.get('strip_images', 'no').lower() == 'yes':
                         body = re.sub(r'<img.*?/>', '', body)
+                    if i.get('strip_empty_links', 'no').lower() == 'yes':
+                        body = re.sub(r'<a\s[^>]*></a>', '', body,
+                            flags=re.MULTILINE)
+                    if i.get('dedupe_brs', 'no').lower() == 'yes':
+                        body = re.sub(r'<br\s*/?>\s*<br\s*/?>(\s*<br\s*/?>)+',
+                            '<br/>', body, flags=re.MULTILINE)
                     body += '<hr/>'
                     seen.add(id)
             if body:
