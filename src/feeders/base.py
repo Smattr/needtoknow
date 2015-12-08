@@ -10,9 +10,10 @@ class Feeder(object):
         raise NotImplementedError
 
 class Entry(object):
-    def __init__(self, name=None, subject=None, content=None, date=None, html=False):
+    def __init__(self, name=None, subject=None, content=None, date=None, html=False, files=None):
         self.name = name or ''
         self.subject = subject or ''
         self.content = content or ''
         self.date = date
         self.html = html
+        self.files = files or []
