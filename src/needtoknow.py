@@ -87,13 +87,11 @@ def main():
         except Exception as e:
             print >>sys.stderr, 'Warning: feeder \'%s\' threw exception: %s' % (f, e)
 
-    out.disconnect()
+        # Commit resource changes.
+        respath = get_resource_path(f)
+        pickler.save(respath, feeders[f].resource)
 
-    # Commit resource changes.
-    for f in feeders:
-        if feeders[f] is not None:
-            respath = get_resource_path(f)
-            pickler.save(respath, feeders[f].resource)
+    out.disconnect()
 
     return 0
 
