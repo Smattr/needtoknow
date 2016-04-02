@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-import argparse, logging, os, sys
-import config, pickler, sender
+import argparse, logging, os, six, sys
+import config, sender
 
 def get_resource_path(name):
     return os.path.join(os.path.expanduser('~'), '.needtoknow/cache/%s.pickle' % name)
@@ -21,7 +21,8 @@ def construct_feeder(name, log):
 
     respath = get_resource_path(name)
     if os.path.exists(respath):
-        resource = pickler.restore(respath)
+        with open(respath) as f:
+            resource = six.moves.cPickle.load(f)
     else:
         resource = {}
 
@@ -102,7 +103,8 @@ def main():
         log.info('  Committing resource changes...')
         # Commit resource changes.
         respath = get_resource_path(f)
-        pickler.save(respath, feeders[f].resource)
+        with open(respath, 'wt') as fobj:
+            six.moves.cPickle.dump(feeders[f].resource, fobj)
 
     out.disconnect()
 
