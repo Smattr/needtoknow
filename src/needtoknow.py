@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import argparse, logging, os, six, sys
+import argparse, logging, os, six, sys, urllib2
 import sender
 
 def get_resource_path(name):
@@ -28,6 +28,13 @@ def construct_feeder(name, log):
 
     return mod.Feeder(resource)
 
+def online():
+    try:
+        urllib2.urlopen('http://www.google.com', timeout=5)
+        return True
+    except urllib2.URLError:
+        return False
+
 def main():
     parser = argparse.ArgumentParser('Monitor RSS and other feeds')
     parser.add_argument('--disable', '-d', action='append', default=[],
@@ -38,6 +45,8 @@ def main():
         help='exclude a particular feed by name')
     parser.add_argument('--include', '-i', action='append', default=[],
         help='include a particular feed by name')
+    parser.add_argument('--check-connection', action='store_true',
+        help='check whether we have an internet connection first')
     opts = parser.parse_args()
 
     log = logging.getLogger('needtoknow')
@@ -47,6 +56,10 @@ def main():
         log.setLevel(logging.INFO)
     else:
         log.setLevel(logging.WARNING)
+
+    if opts.check_connection and not online():
+        log.info('no network connection; exiting')
+        return 0
 
     conf = six.moves.configparser.SafeConfigParser()
 
