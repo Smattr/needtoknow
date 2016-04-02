@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import argparse, logging, os, six, sys
-import config, sender
+import sender
 
 def get_resource_path(name):
     return os.path.join(os.path.expanduser('~'), '.needtoknow/cache/%s.pickle' % name)
@@ -48,14 +48,20 @@ def main():
     else:
         log.setLevel(logging.WARNING)
 
+    conf = six.moves.configparser.SafeConfigParser()
+
     try:
-        conf = config.get_config()
+        with open(os.path.expanduser('~/.needtoknow/conf.ini')) as f:
+            conf.readfp(f)
     except Exception as e:
         log.error('Failed to parse config: %s' % e)
         return -1
 
+    feeds = six.moves.configparser.SafeConfigParser()
+
     try:
-        feeds = config.get_feeds()
+        with open(os.path.expanduser('~/.needtoknow/feeds.ini')) as f:
+            feeds.readfp(f)
     except Exception as e:
         log.error('Failed to parse feeds: %s' % e)
         return -1
