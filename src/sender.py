@@ -1,4 +1,4 @@
-import mimetypes, smtplib
+import imaplib, mimetypes, time
 from email import encoders
 from email.mime.multipart import MIMEMultipart
 from email.mime.audio import MIMEAudio
@@ -8,24 +8,25 @@ from email.mime.text import MIMEText
 
 class Sender(object):
     def __init__(self, conf):
-        if conf.has_section('smtp'):
-            self.opts = dict(conf.items('smtp'))
+        if conf.has_section('imap'):
+            self.opts = dict(conf.items('imap'))
         self.conn = None
 
     def connect(self):
         self.disconnect()
-        self.conn = smtplib.SMTP(self.opts['host'], self.opts['port'])
-        if 'tls' in self.opts and self.opts['tls'].lower() == 'true':
-            self.conn.starttls()
+        self.conn = imaplib.IMAP4_SSL(self.opts['host'], self.opts['port'])
         if 'login' in self.opts:
             self.conn.login(self.opts['login'], self.opts['password'])
+        if 'folder' in self.opts:
+            self.conn.select(self.opts['folder'])
         
     def disconnect(self):
         if self.conn:
             try:
-                self.conn.quit()
+                self.conn.close()
             except:
                 pass
+            self.conn.logout()
         self.conn = None
 
     def send(self, entry):
@@ -53,9 +54,13 @@ class Sender(object):
                 encoders.encode_base64(payload)
             payload.add_header('Content-Disposition', 'attachment', filename=name)
             m.attach(payload)
-        m['To'] = self.opts['to']
-        m['From'] = '%s <%s>' % (entry.name, self.opts['from'])
+        m['To'] = self.opts.get('login', 'Me')
+        m['From'] = entry.name
         m['Subject'] = '[%s] %s' % (entry.name, entry.subject)
         if entry.date:
             m['Date'] = entry.date
-        self.conn.sendmail(self.opts['from'], self.opts['to'], m.as_string())
+            stamp = time.mktime(entry.date)
+        else:
+            stamp = time.time()
+        self.conn.append(self.opts.get('folder', 'INBOX'), '',
+            imaplib.Time2Internaldate(stamp), m.as_string())

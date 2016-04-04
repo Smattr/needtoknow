@@ -25,7 +25,7 @@ def get_content(entry):
 
 def get_date(entry):
     try:
-        return entry.date
+        return entry.updated_parsed
     except:
         return None
 
