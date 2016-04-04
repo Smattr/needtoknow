@@ -3,11 +3,11 @@
 import argparse, logging, os, six, sys, urllib2
 import sender
 
-def get_resource_path(name):
-    return os.path.join(os.path.expanduser('~'), '.needtoknow/cache/%s.pickle' % name)
+def get_resource_path(root, name):
+    return os.path.join(root, 'cache/%s.pickle' % name)
 
 _PATH_APPENDED = False
-def construct_feeder(name, log):
+def construct_feeder(root, name, log):
     global _PATH_APPENDED
     if not _PATH_APPENDED:
         sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'feeders'))
@@ -19,7 +19,7 @@ def construct_feeder(name, log):
         log.warning('failed to import feeder %s: %s' % (name, e))
         return None
 
-    respath = get_resource_path(name)
+    respath = get_resource_path(root, name)
     if os.path.exists(respath):
         with open(respath) as f:
             resource = six.moves.cPickle.load(f)
@@ -47,6 +47,8 @@ def main():
         help='include a particular feed by name')
     parser.add_argument('--check-connection', action='store_true',
         help='check whether we have an internet connection first')
+    parser.add_argument('--config', default=os.path.expanduser('~/.needtoknow'),
+        help='configuration location')
     opts = parser.parse_args()
 
     log = logging.getLogger('needtoknow')
@@ -64,7 +66,7 @@ def main():
     conf = six.moves.configparser.SafeConfigParser()
 
     try:
-        with open(os.path.expanduser('~/.needtoknow/conf.ini')) as f:
+        with open(os.path.join(opts.config, 'conf.ini')) as f:
             conf.readfp(f)
     except Exception as e:
         log.error('Failed to parse config: %s' % e)
@@ -73,7 +75,7 @@ def main():
     feeds = six.moves.configparser.SafeConfigParser()
 
     try:
-        with open(os.path.expanduser('~/.needtoknow/feeds.ini')) as f:
+        with open(os.path.join(opts.config, 'feeds.ini')) as f:
             feeds.readfp(f)
     except Exception as e:
         log.error('Failed to parse feeds: %s' % e)
@@ -86,7 +88,7 @@ def main():
         f = feeds.get(s, 'feeder')
         if f not in feeders:
             log.info(' Loading %s...' % f)
-            feeders[f] = construct_feeder(f, log)
+            feeders[f] = construct_feeder(opts.config, f, log)
 
         if feeders[f] is None:
             log.warning(' Warning: No feeder named %s (referenced by %s).' % (f, s))
@@ -121,7 +123,7 @@ def main():
 
         log.info('  Committing resource changes...')
         # Commit resource changes.
-        respath = get_resource_path(f)
+        respath = get_resource_path(opts.config, f)
         with open(respath, 'wt') as fobj:
             six.moves.cPickle.dump(feeders[f].resource, fobj)
 
