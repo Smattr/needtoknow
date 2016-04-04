@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
-import argparse, logging, os, six, sys, urllib2
+import argparse, bz2, logging, os, six, sys, urllib2
 import sender
 
 def get_resource_path(root, name):
-    return os.path.join(root, 'cache/%s.pickle' % name)
+    return os.path.join(root, 'cache/%s.pickle.bz2' % name)
 
 _PATH_APPENDED = False
 def construct_feeder(root, name, log):
@@ -21,7 +21,7 @@ def construct_feeder(root, name, log):
 
     respath = get_resource_path(root, name)
     if os.path.exists(respath):
-        with open(respath) as f:
+        with bz2.BZ2File(respath, 'rb') as f:
             resource = six.moves.cPickle.load(f)
     else:
         resource = {}
@@ -124,7 +124,7 @@ def main():
         log.info('  Committing resource changes...')
         # Commit resource changes.
         respath = get_resource_path(opts.config, f)
-        with open(respath, 'wt') as fobj:
+        with bz2.BZ2File(respath, 'wb') as fobj:
             six.moves.cPickle.dump(feeders[f].resource, fobj)
 
     out.disconnect()
