@@ -1,4 +1,4 @@
-import imaplib, mimetypes, time
+import email, imaplib, mimetypes, time
 from email import encoders
 from email.mime.multipart import MIMEMultipart
 from email.mime.audio import MIMEAudio
@@ -58,8 +58,8 @@ class Sender(object):
         m['From'] = entry.name
         m['Subject'] = '[%s] %s' % (entry.name, entry.subject)
         if entry.date:
-            m['Date'] = entry.date
             stamp = time.mktime(entry.date)
+            m['Date'] = email.utils.formatdate(stamp)
         else:
             stamp = time.time()
         self.conn.append(self.opts.get('folder', 'INBOX'), '',
