@@ -1,4 +1,4 @@
-import email, imaplib, mimetypes, time
+import email, imaplib, mimetypes, re, time
 from email import encoders
 from email.mime.multipart import MIMEMultipart
 from email.mime.audio import MIMEAudio
@@ -55,7 +55,13 @@ class Sender(object):
             payload.add_header('Content-Disposition', 'attachment', filename=name)
             m.attach(payload)
         m['To'] = self.opts.get('login', 'Me')
-        m['From'] = entry.name
+        # Make the sender look like a valid email if it does not already. This
+        # has no effect in most email clients, but the GMail web and phone apps
+        # insist on labelling such emails "unknown sender".
+        if re.search(r'<.+@.+>', entry.name) is None:
+            m['From'] = '%s <example@example.com>' % entry.name
+        else:
+            m['From'] = entry.name
         m['Subject'] = '[%s] %s' % (entry.name, entry.subject)
         if entry.date:
             stamp = time.mktime(entry.date)
