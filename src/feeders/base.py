@@ -1,3 +1,5 @@
+import urllib2
+
 class Feeder(object):
     def __init__(self, resource):
         self.resource = resource
@@ -17,3 +19,13 @@ class Entry(object):
         self.date = date
         self.html = html
         self.files = files or []
+
+def download(url):
+    RETRIES = 3
+    for i in range(RETRIES):
+        try:
+            response = urllib2.urlopen(url)
+            return response.read()
+        except urllib2.URLError:
+            if i == RETRIES - 1:
+                raise
