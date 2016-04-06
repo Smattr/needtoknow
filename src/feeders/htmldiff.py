@@ -1,5 +1,5 @@
 import base
-import difflib, urllib2
+import difflib
 
 class Feeder(base.Feeder):
     def __iter__(self):
@@ -13,8 +13,7 @@ class Feeder(base.Feeder):
                 old = []
                 oldurl = '/dev/null'
             try:
-                response = urllib2.urlopen(url)
-                new = response.read().strip().splitlines()
+                new = base.download(url).strip().splitlines()
             except Exception as e:
                 raise Exception('Error while loading %(url)s: %(err)s' % {
                     'url':url,
