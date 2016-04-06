@@ -1,4 +1,4 @@
-import base, re, rsscommon
+import base, datetime, re, rsscommon
 
 class Feeder(base.Feeder):
     def __iter__(self):
@@ -29,5 +29,5 @@ class Feeder(base.Feeder):
                     body += '<hr/>'
                     seen.add(id)
             if body:
-                yield base.Entry(n, '%s summary' % n, body, html=True)
+                yield base.Entry(n, '%s summary (%s)' % (n, datetime.datetime.now().strftime('%Y-%m-%d %H:%M')), body, html=True)
             self.resource[url] = seen
