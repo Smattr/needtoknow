@@ -17,8 +17,6 @@ class Sender(object):
         self.conn = imaplib.IMAP4_SSL(self.opts['host'], self.opts['port'])
         if 'login' in self.opts:
             self.conn.login(self.opts['login'], self.opts['password'])
-        if 'folder' in self.opts:
-            self.conn.select(self.opts['folder'])
         
     def disconnect(self):
         if self.conn:
