@@ -8,15 +8,18 @@ from email.mime.text import MIMEText
 
 class Sender(object):
     def __init__(self, conf):
-        if conf.has_section('imap'):
-            self.opts = dict(conf.items('imap'))
+        self.host = str(conf['host'])
+        self.port = str(conf.get('port', '993'))
+        self.login = str(conf['login'])
+        self.password = str(conf['password'])
+        self.folder = str(conf.get('folder', 'INBOX'))
         self.conn = None
 
     def connect(self):
         self.disconnect()
-        self.conn = imaplib.IMAP4_SSL(self.opts['host'], self.opts['port'])
-        if 'login' in self.opts:
-            self.conn.login(self.opts['login'], self.opts['password'])
+        self.conn = imaplib.IMAP4_SSL(self.host, self.port)
+        if self.login is not None:
+            self.conn.login(self.login, self.password)
         
     def disconnect(self):
         if self.conn:
@@ -52,7 +55,7 @@ class Sender(object):
                 encoders.encode_base64(payload)
             payload.add_header('Content-Disposition', 'attachment', filename=name)
             m.attach(payload)
-        m['To'] = self.opts.get('login', 'Me')
+        m['To'] = 'Me' if self.login is None else self.login
         # Make the sender look like a valid email if it does not already. This
         # has no effect in most email clients, but the GMail web and phone apps
         # insist on labelling such emails "unknown sender".
@@ -66,5 +69,5 @@ class Sender(object):
             m['Date'] = email.utils.formatdate(stamp)
         else:
             stamp = time.time()
-        self.conn.append(self.opts.get('folder', 'INBOX'), '',
+        self.conn.append('INBOX' if self.folder is None else self.folder, '',
             imaplib.Time2Internaldate(stamp), m.as_string())

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import argparse, bz2, logging, os, six, sys, urllib2
+import argparse, bz2, collections, json, logging, numbers, os, six, sys, urllib2
 import sender
 
 def get_resource_path(root, name):
@@ -63,20 +63,27 @@ def main():
         log.info('no network connection; exiting')
         return 0
 
-    conf = six.moves.configparser.SafeConfigParser()
-
     try:
-        with open(os.path.join(opts.config, 'conf.ini')) as f:
-            conf.readfp(f)
+        with open(os.path.join(opts.config, 'conf.json')) as f:
+            conf = json.load(f)
+        if not isinstance(conf, collections.Mapping):
+            raise TypeError('configuration is not a JSON object')
+        if not all(isinstance(v, six.string_types + (numbers.Integral,))
+                for v in conf.values()):
+            raise TypeError('configuration values are not all strings or '
+                'numbers')
     except Exception as e:
         log.error('Failed to parse config: %s' % e)
         return -1
 
-    feeds = six.moves.configparser.SafeConfigParser()
-
     try:
-        with open(os.path.join(opts.config, 'feeds.ini')) as f:
-            feeds.readfp(f)
+        with open(os.path.join(opts.config, 'feeds.json')) as f:
+            feeds = json.load(f)
+        if not isinstance(feeds, collections.Mapping):
+            raise TypeError('feeds is not a JSON object')
+        if not all(isinstance(v, collections.Mapping)
+                for v in feeds.values()):
+            raise TypeError('feed values are not all JSON objects')
     except Exception as e:
         log.error('Failed to parse feeds: %s' % e)
         return -1
@@ -84,8 +91,8 @@ def main():
     feeders = {}
 
     log.info('Loading feeders...')
-    for s in feeds.sections():
-        f = feeds.get(s, 'feeder')
+    for s, v in feeds.items():
+        f = v.get('feeder')
         if f not in feeders:
             log.info(' Loading %s...' % f)
             feeders[f] = construct_feeder(opts.config, f, log)
@@ -94,7 +101,7 @@ def main():
             log.warning(' Warning: No feeder named %s (referenced by %s).' % (f, s))
         else:
             if s in opts.include or (opts.include == [] and s not in opts.exclude):
-                feeders[f].add(s, dict(feeds.items(s)))
+                feeders[f].add(s, v)
 
     out = sender.Sender(conf)
     try:
