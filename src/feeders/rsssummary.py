@@ -7,12 +7,12 @@ class Feeder(base.Feeder):
             url = i['url']
             seen = self.resource.get(url, set())
             entries = rsscommon.get_entries(url)
-            body = ''
+            content = []
             for e in entries:
                 id = rsscommon.get_id(e)
                 if id not in seen:
                     links = rsscommon.get_links(e)
-                    body += '<p><b>%(title)s</b><br/><font size="-1">%(links)s</font></p>' % {
+                    body = '<p><b>%(title)s</b><br/><font size="-1">%(links)s</font></p>' % {
                         'title':e.title,
                         'links':'<br/>'.join(map(lambda x: '<a href="%(link)s">%(link)s</a>' % {'link':x}, links)),
                     }
@@ -26,8 +26,10 @@ class Feeder(base.Feeder):
                     if i.get('dedupe_brs', 'no').lower() == 'yes':
                         body = re.sub(r'<br\s*/?>\s*<br\s*/?>(\s*<br\s*/?>)+',
                             '<br/>', body, flags=re.MULTILINE)
-                    body += '<hr/>'
+                    content.append(body)
                     seen.add(id)
-            if body:
-                yield base.Entry(n, '%s summary (%s)' % (n, datetime.datetime.now().strftime('%Y-%m-%d %H:%M')), body, html=True)
+            if len(content) > 0:
+                yield base.Entry(n, '%s summary (%s)' % (n,
+                    datetime.datetime.now().strftime('%Y-%m-%d %H:%M')),
+                    '<hr/>'.join(content), html=True)
             self.resource[url] = seen
