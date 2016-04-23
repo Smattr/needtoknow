@@ -63,7 +63,7 @@ class Sender(object):
             m['From'] = '%s <example@example.com>' % entry.name
         else:
             m['From'] = entry.name
-        m['Subject'] = '[%s] %s' % (entry.name, entry.subject)
+        m['Subject'] = entry.subject
         if entry.date:
             stamp = time.mktime(entry.date)
             m['Date'] = email.utils.formatdate(stamp)
