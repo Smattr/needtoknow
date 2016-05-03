@@ -1,10 +1,11 @@
-import email, imaplib, mimetypes, re, time
+import bs4, email, imaplib, mimetypes, re, time, urllib2
 from email import encoders
 from email.mime.multipart import MIMEMultipart
 from email.mime.audio import MIMEAudio
 from email.mime.image import MIMEImage
 from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
+from feeders.base import download
 
 class Sender(object):
     def __init__(self, conf):
@@ -32,6 +33,26 @@ class Sender(object):
 
     def send(self, entry):
         assert self.conn is not None
+
+        # If we're sending HTML, try to find and embed any referenced images.
+        images = []
+        if entry.html:
+            content = None
+            try:
+                content = bs4.BeautifulSoup(entry.content)
+            except:
+                pass
+            if content is not None:
+                for index, img in enumerate(content.findAll('img',
+                        src=re.compile('^https?://'))):
+                    try:
+                        data = download(img['src'])
+                    except urllib2.URLError:
+                        continue
+                    images.append((index, data))
+                    img['src'] = 'cid:image%d' % index
+                entry.content = str(content)
+
         m = MIMEMultipart()
         part = MIMEText(entry.content, 'html' if entry.html else 'plain',
             _charset='utf-8')
@@ -55,6 +76,13 @@ class Sender(object):
                 encoders.encode_base64(payload)
             payload.add_header('Content-Disposition', 'attachment', filename=name)
             m.attach(payload)
+
+        # Embed any referenced images.
+        for index, data in images:
+            att = MIMEImage(data)
+            att.add_header('Content-ID', '<image%d>' % index)
+            m.attach(att)
+
         m['To'] = 'Me' if self.login is None else self.login
         # Make the sender look like a valid email if it does not already. This
         # has no effect in most email clients, but the GMail web and phone apps
