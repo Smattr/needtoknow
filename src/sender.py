@@ -53,7 +53,7 @@ class Sender(object):
                     img['src'] = 'cid:image%d' % index
                 entry.content = str(content)
 
-        m = MIMEMultipart()
+        m = MIMEMultipart('related')
         part = MIMEText(entry.content, 'html' if entry.html else 'plain',
             _charset='utf-8')
         m.attach(part)
