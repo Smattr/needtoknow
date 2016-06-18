@@ -31,7 +31,7 @@ class Sender(object):
             self.conn.logout()
         self.conn = None
 
-    def send(self, entry):
+    def send(self, entry, log):
         assert self.conn is not None
 
         # If we're sending HTML, try to find and embed any referenced images.
@@ -102,5 +102,6 @@ class Sender(object):
             m['Date'] = email.utils.formatdate(stamp)
         else:
             stamp = time.time()
+        log.info('  Sending "%s"...' % entry.subject)
         self.conn.append('INBOX' if self.folder is None else self.folder, '',
             imaplib.Time2Internaldate(stamp), m.as_string())
