@@ -49,7 +49,13 @@ class Sender(object):
                         data = download(img['src'])
                     except urllib2.URLError:
                         continue
-                    images.append((index, data))
+                    try:
+                        att = MIMEImage(data)
+                    except TypeError:
+                        # If we can't guess the MIME subtype, just skip this
+                        # one.
+                        continue
+                    images.append((index, att))
                     img['src'] = 'cid:image%d' % index
                 entry.content = str(content)
 
@@ -78,8 +84,7 @@ class Sender(object):
             m.attach(payload)
 
         # Embed any referenced images.
-        for index, data in images:
-            att = MIMEImage(data)
+        for index, att in images:
             att.add_header('Content-ID', '<image%d>' % index)
             m.attach(att)
 
