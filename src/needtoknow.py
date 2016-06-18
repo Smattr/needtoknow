@@ -121,7 +121,7 @@ def main():
             log.info(' Scanning %s...' % f)
             for entry in feeders[f]:
                 try:
-                    out.send(entry)
+                    out.send(entry, log)
                 except Exception as e:
                     log.error('  Failed to send update for %s: %s' % (entry.name, e))
                     return -1
