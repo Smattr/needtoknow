@@ -15,10 +15,11 @@ class Feeder(base.Feeder):
             try:
                 new = base.download(url).strip().splitlines()
             except Exception as e:
-                raise Exception('Error while loading %(url)s: %(err)s' % {
+                yield Exception('Error while loading %(url)s: %(err)s' % {
                     'url':url,
                     'err':e,
                 })
+                continue
             content = '\n'.join(list(difflib.unified_diff(old, new,
                 fromfile=oldurl, tofile=url, lineterm='')))
             if content:

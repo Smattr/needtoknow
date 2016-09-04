@@ -120,6 +120,9 @@ def main():
         try:
             log.info(' Scanning %s...' % f)
             for entry in feeders[f]:
+                if isinstance(entry, Exception):
+                    log.warning('  Feeder \'%s\' threw exception: %s' % (f, entry))
+                    continue
                 try:
                     out.send(entry, log)
                 except Exception as e:

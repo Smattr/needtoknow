@@ -21,7 +21,7 @@ class Feeder(base.Feeder):
                         seen.add(id)
                 self.resource[url] = seen
             except Exception as e:
-                raise Exception('Error from feed %(name)s: %(err)s' % {
+                yield Exception('Error from feed %(name)s: %(err)s' % {
                     'name':n,
                     'err':e,
                 })
