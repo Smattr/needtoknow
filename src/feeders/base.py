@@ -29,7 +29,7 @@ def download(url):
         except urllib2.URLError as e:
             if i == RETRIES - 1:
                 raise
-            if e.code == 403:
+            if getattr(e, 'code', None) == 403:
                 # Some sites explicitly block urllib2 to prevent crawling (e.g.
                 # Microsoft). Since we're not really a crawler, sidestep this by
                 # twiddling our user agent.
