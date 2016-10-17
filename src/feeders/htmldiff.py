@@ -1,4 +1,4 @@
-import base
+import diffcommon, base
 import difflib
 
 class Feeder(base.Feeder):
@@ -20,8 +20,11 @@ class Feeder(base.Feeder):
                     'err':e,
                 })
                 continue
-            content = '\n'.join(list(difflib.unified_diff(old, new,
-                fromfile=oldurl, tofile=url, lineterm='')))
-            if content:
+            lines = list(difflib.unified_diff(old, new, fromfile=oldurl,
+                tofile=url, lineterm=''))
+            if i.get('ignore_white_space', 'yes').lower() == 'yes':
+                lines = list(diffcommon.suppress_whitespace(lines))
+            if len(lines) > 2:
+                content = '\n'.join(lines)
                 yield base.Entry(n, '%s changes' % url, content)
             self.resource[url] = '\n'.join(new)
