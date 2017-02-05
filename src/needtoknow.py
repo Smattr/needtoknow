@@ -110,6 +110,8 @@ def main():
         log.error('Failed to connect to mail server: %s' % e)
         return -1
 
+    ret = 0
+
     log.info('Looking for updates...')
     for f in feeders:
         if feeders[f] is None:
@@ -122,12 +124,13 @@ def main():
             for entry in feeders[f]:
                 if isinstance(entry, Exception):
                     log.warning('  Feeder \'%s\' threw exception: %s' % (f, entry))
+                    ret = -1
                     continue
                 try:
                     out.send(entry, log)
                 except Exception as e:
                     log.error('  Failed to send update for %s: %s' % (entry.name, e))
-                    return -1
+                    ret = -1
         except Exception as e:
             log.warning('  Feeder \'%s\' threw exception: %s' % (f, e))
 
@@ -139,7 +142,7 @@ def main():
 
     out.disconnect()
 
-    return 0
+    return ret
 
 if __name__ == '__main__':
     sys.exit(main())
