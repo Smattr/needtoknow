@@ -9,16 +9,22 @@ class Feeder(base.Feeder):
             try:
                 entries = rsscommon.get_entries(url)
                 for e in entries:
-                    id = rsscommon.get_id(e)
-                    if id not in seen:
-                        links = rsscommon.get_links(e)
-                        yield base.Entry(n, e.title, \
-                           '<p><b>%(title)s</b><br/><font size="-1">%(links)s</font></p>%(content)s' % {
-                               'title':e.title,
-                               'links':'<br/>'.join(map(lambda x: '<a href="%(link)s">%(link)s</a>' % {'link':x}, links)),
-                               'content':rsscommon.get_content(e),
-                           }, date=rsscommon.get_date(e), html=True)
-                        seen.add(id)
+                    try:
+                        id = rsscommon.get_id(e)
+                        if id not in seen:
+                            links = rsscommon.get_links(e)
+                            yield base.Entry(n, e.title, \
+                               '<p><b>%(title)s</b><br/><font size="-1">%(links)s</font></p>%(content)s' % {
+                                   'title':e.title,
+                                   'links':'<br/>'.join(map(lambda x: '<a href="%(link)s">%(link)s</a>' % {'link':x}, links)),
+                                   'content':rsscommon.get_content(e),
+                               }, date=rsscommon.get_date(e), html=True)
+                            seen.add(id)
+                    except Exception as e:
+                        yield Exception('Error from feed %(name)s: %(err)s' % {
+                            'name':n,
+                            'err':e,
+                        })
                 self.resource[url] = seen
             except Exception as e:
                 yield Exception('Error from feed %(name)s: %(err)s' % {
