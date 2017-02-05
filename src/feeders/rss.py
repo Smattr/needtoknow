@@ -1,4 +1,5 @@
 import base, rsscommon
+import cgi
 
 class Feeder(base.Feeder):
     def __iter__(self):
@@ -15,7 +16,7 @@ class Feeder(base.Feeder):
                             links = rsscommon.get_links(e)
                             yield base.Entry(n, e.title, \
                                '<p><b>%(title)s</b><br/><font size="-1">%(links)s</font></p>%(content)s' % {
-                                   'title':e.title,
+                                   'title':cgi.escape(e.title),
                                    'links':'<br/>'.join(map(lambda x: '<a href="%(link)s">%(link)s</a>' % {'link':x}, links)),
                                    'content':rsscommon.get_content(e),
                                }, date=rsscommon.get_date(e), html=True)

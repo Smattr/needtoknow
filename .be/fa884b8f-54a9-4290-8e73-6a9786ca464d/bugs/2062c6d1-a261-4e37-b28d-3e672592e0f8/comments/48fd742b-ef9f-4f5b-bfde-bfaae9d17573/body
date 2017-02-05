@@ -1,0 +1,4 @@
+This should now be fixed. The issue was that the title, retrieved from XML, is
+decoded into plain text for display, however we then were *not* encoding this
+into HTML when putting it into an HTML-formatted email. We now encode the title
+in RSS and RSSSummary feeders.
