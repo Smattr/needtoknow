@@ -3,7 +3,7 @@ Functionality common to RSS-based feeders. This file is not intended to be
 imported as a standalone feeder.
 '''
 
-import feedparser
+import cgi, feedparser
 
 def get_entries(url):
     return feedparser.parse(url).entries
@@ -40,3 +40,11 @@ def get_links(entry):
     except:
         pass
     return l
+
+def get_title(entry):
+    try:
+        if entry.title_detail.type == 'text/html':
+            return entry.title_detail.value
+    except:
+        pass
+    return cgi.escape(entry.title)

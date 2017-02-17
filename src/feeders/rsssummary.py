@@ -14,7 +14,7 @@ class Feeder(base.Feeder):
                 if id not in seen:
                     links = rsscommon.get_links(e)
                     body = '<p><b>%(title)s</b><br/><font size="-1">%(links)s</font></p>' % {
-                        'title':cgi.escape(e.title),
+                        'title':rsscommon.get_title(e),
                         'links':'<br/>'.join(map(lambda x: '<a href="%s">%s</a>' % (x, cgi.escape(x)), links)),
                     }
                     if i.get('description', 'no').lower() == 'yes':
