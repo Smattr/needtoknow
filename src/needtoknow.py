@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import argparse, bz2, collections, json, logging, numbers, os, six, sys, urllib2
+import argparse, bz2, collections, json, logging, numbers, os, re, six, sys, urllib2
 import sender
 
 def get_resource_path(root, name):
@@ -125,6 +125,24 @@ def main():
                 if isinstance(entry, Exception):
                     log.warning('  Feeder \'%s\' threw exception: %s' % (f, entry))
                     ret = -1
+                    continue
+                # Check if we should discard this entry.
+                assert entry.name in feeders[f].feeds, \
+                    'feeder \'%s\' yielded entry from unknown feed \'%s\'' % \
+                    (f, entry.name)
+                skip = False
+                for blacklist in feeders[f].feeds[entry.name].get('blacklist', []):
+                    try:
+                        if re.search(blacklist, entry.subject) is not None:
+                            log.info('  Discarding \'[%s] %s\' as blacklisted' %
+                                (entry.name, entry.subject))
+                            skip = True
+                            break
+                    except Exception as e:
+                        log.error('  Failed to run regex blacklist \'%s\' '
+                            'against %s: %s' % (blacklist, entry.name, e))
+                        ret = -1
+                if skip:
                     continue
                 try:
                     out.send(entry, log)
