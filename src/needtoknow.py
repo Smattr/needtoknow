@@ -147,7 +147,7 @@ def main():
                 try:
                     out.send(entry, log)
                 except Exception as e:
-                    log.error('  Failed to send update for %s: %s' % (entry.name, e))
+                    log.error('  Failed to send update for %s \'%s\': %s' % (entry.name, entry.subject, e))
                     ret = -1
         except Exception as e:
             log.warning('  Feeder \'%s\' threw exception: %s' % (f, e))
