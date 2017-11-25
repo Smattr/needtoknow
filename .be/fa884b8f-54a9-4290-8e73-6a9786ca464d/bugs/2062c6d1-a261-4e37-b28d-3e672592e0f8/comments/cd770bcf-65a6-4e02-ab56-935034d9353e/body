@@ -1,4 +1,0 @@
-The less than symbol (<) when used in titles does not seem to be properly
-escaped when rendering to HTML. I haven't fully checked the article where I saw
-this occur as to whether perhaps the symbol is not correctly escaped in the RSS
-XML, but we should probably handle this case anyway.
