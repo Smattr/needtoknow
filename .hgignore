@@ -1,4 +1,0 @@
-syntax: regexp
-\.be/id-cache
-\.pyc$
-\.orig$
