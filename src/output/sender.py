@@ -1,4 +1,4 @@
-import bs4, email, imaplib, mimetypes, re, time, urllib2
+import bs4, email, imaplib, mimetypes, re, time, urllib.error
 from email import encoders
 from email.mime.multipart import MIMEMultipart
 from email.mime.audio import MIMEAudio
@@ -54,7 +54,7 @@ class Sender(object):
                         break
                     try:
                         data = download(img['src'])
-                    except urllib2.URLError:
+                    except urllib.error.URLError:
                         continue
                     downloaded += len(data)
                     if downloaded > EMBED_THRESHHOLD:

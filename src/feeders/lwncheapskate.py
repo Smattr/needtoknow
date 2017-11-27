@@ -3,8 +3,8 @@ Feeder for LWN that only notifies you when a page is available to
 non-subscribers.
 '''
 
-import base, rsscommon
-import urllib2
+from . import base, rsscommon
+import urllib.request
 
 class Feeder(base.Feeder):
     def __iter__(self):
@@ -18,7 +18,7 @@ class Feeder(base.Feeder):
                 if id not in seen:
                     try:
                         # See if the page is available.
-                        urllib2.urlopen(e.link)
+                        urllib.request.urlopen(e.link)
                         # No 503 :)
                         yield base.Entry(n, e.title, rsscommon.get_content(e), html=True)
                         seen.add(id)

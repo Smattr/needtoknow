@@ -1,4 +1,4 @@
-import diffcommon, base
+from . import diffcommon, base
 import bs4, difflib
 
 class Feeder(base.Feeder):

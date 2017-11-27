@@ -1,9 +1,9 @@
-import base
-import cStringIO, os, shutil, subprocess, tarfile, tempfile
+from . import base
+import io, os, shutil, subprocess, tarfile, tempfile
 
 def run(cmd, cwd):
     p = subprocess.Popen(cmd, cwd=cwd, stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE)
+        stderr=subprocess.PIPE, universal_newlines=True)
     stdout, stderr = p.communicate()
     return p.returncode, stdout.strip(), stderr.strip()
 
@@ -42,7 +42,7 @@ class Feeder(base.Feeder):
                 # need to extract it.
                 last_commit, data = state
 
-                buffer = cStringIO.StringIO(data)
+                buffer = io.StringIO(data)
                 with tarfile.open(fileobj=buffer) as t:
                     t.extractall(tmp)
 
@@ -109,7 +109,7 @@ class Feeder(base.Feeder):
             # Tar up the working directory to store in our resources. We don't
             # bother compressing it because the resources as a whole are
             # compressed.
-            buffer = cStringIO.StringIO()
+            buffer = io.StringIO()
             with tarfile.open(fileobj=buffer, mode='w') as t:
                 for item in os.listdir(tmp):
                     path = os.path.join(tmp, item)

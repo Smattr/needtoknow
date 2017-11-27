@@ -1,20 +1,14 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-import argparse, bz2, collections, json, logging, numbers, os, re, six, sys, urllib2
-import sender
+import argparse, bz2, collections, importlib, json, logging, numbers, os, pickle, re, sys, urllib.error, urllib.request
+from output import sender
 
 def get_resource_path(root, name):
     return os.path.join(root, 'cache/%s.pickle.bz2' % name)
 
-_PATH_APPENDED = False
 def construct_feeder(root, name, log):
-    global _PATH_APPENDED
-    if not _PATH_APPENDED:
-        sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'feeders'))
-        _PATH_APPENDED = True
-
     try:
-        mod = __import__(name)
+        mod = importlib.import_module('feeders.%s' % name)
     except Exception as e:
         log.warning('failed to import feeder %s: %s' % (name, e))
         return None
@@ -22,7 +16,7 @@ def construct_feeder(root, name, log):
     respath = get_resource_path(root, name)
     if os.path.exists(respath):
         with bz2.BZ2File(respath, 'rb') as f:
-            resource = six.moves.cPickle.load(f)
+            resource = pickle.load(f)
     else:
         resource = {}
 
@@ -30,9 +24,9 @@ def construct_feeder(root, name, log):
 
 def online():
     try:
-        urllib2.urlopen('http://www.google.com', timeout=5)
+        urllib.request.urlopen('http://www.google.com', timeout=5)
         return True
-    except urllib2.URLError:
+    except urllib.error.URLError:
         return False
 
 def main():
@@ -70,7 +64,7 @@ def main():
             conf = json.load(f)
         if not isinstance(conf, collections.Mapping):
             raise TypeError('configuration is not a JSON object')
-        if not all(isinstance(v, six.string_types + (numbers.Integral,))
+        if not all(isinstance(v, (str, numbers.Integral))
                 for v in conf.values()):
             raise TypeError('configuration values are not all strings or '
                 'numbers')
@@ -162,7 +156,7 @@ def main():
             # Commit resource changes.
             respath = get_resource_path(opts.config, f)
             with bz2.BZ2File(respath, 'wb') as fobj:
-                six.moves.cPickle.dump(feeders[f].resource, fobj)
+                pickle.dump(feeders[f].resource, fobj)
 
     out.disconnect()
 

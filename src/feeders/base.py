@@ -1,4 +1,4 @@
-import urllib2
+import urllib.error, urllib.request
 
 class Feeder(object):
     def __init__(self, resource):
@@ -24,15 +24,15 @@ def download(url):
     RETRIES = 3
     for i in range(RETRIES):
         try:
-            response = urllib2.urlopen(url)
+            response = urllib.request.urlopen(url)
             return response.read()
-        except urllib2.URLError as e:
+        except urllib.error.URLError as e:
             if i == RETRIES - 1:
                 raise
             if getattr(e, 'code', None) == 403:
-                # Some sites explicitly block urllib2 to prevent crawling (e.g.
+                # Some sites explicitly block urllib to prevent crawling (e.g.
                 # Microsoft). Since we're not really a crawler, sidestep this by
                 # twiddling our user agent.
-                request = urllib2.Request(url, headers={'User-Agent':''})
-                response = urllib2.urlopen(request)
+                request = urllib.request.Request(url, headers={'User-Agent':''})
+                response = urllib.request.urlopen(request)
                 return response.read()

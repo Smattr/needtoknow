@@ -1,4 +1,4 @@
-import base, rsscommon
+from . import base, rsscommon
 
 class Feeder(base.Feeder):
     def __iter__(self):

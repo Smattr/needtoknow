@@ -1,5 +1,5 @@
-import base, datetime, re, rsscommon
-import cgi
+from . import base, rsscommon
+import cgi, datetime, re
 
 class Feeder(base.Feeder):
     def __iter__(self):
