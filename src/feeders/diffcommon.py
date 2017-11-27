@@ -8,12 +8,12 @@ def suppress_whitespace(lines):
 
     # Initial state. Note that we only accumulate lines in IN_HUNK.
     state = IDLE
-    accumulated = None
+    accumulated = []
 
     for line in lines:
 
         if state == IDLE:
-            assert accumulated is None
+            assert len(accumulated) == 0
 
             if line.startswith('@@'):
                 # Encountered a new hunk.
@@ -27,14 +27,14 @@ def suppress_whitespace(lines):
 
         else:
             assert state == IN_HUNK
-            assert isinstance(accumulated, list)
+            assert len(accumulated) > 0
 
             if (line.startswith('+') or line.startswith('-')) and \
                     line[1:].strip() != '':
                 # This is a non-empty change line. Decide to keep this hunk.
                 for a in accumulated:
                     yield a
-                accumulated = None
+                accumulated = []
                 state = IDLE
 
             elif line.startswith('@@'):
