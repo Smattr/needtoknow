@@ -72,7 +72,7 @@ class Feeder(base.Feeder):
 
             # Look for any new commits to this branch.
             seen_last_commit = False
-            for commit in stdout.split('\n'):
+            for commit in stdout.splitlines():
 
                 if last_commit is None or seen_last_commit:
                     # This is a new commit.
