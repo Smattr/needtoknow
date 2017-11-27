@@ -1,5 +1,5 @@
 import diffcommon, base
-import difflib, nltk
+import bs4, difflib
 
 class Feeder(base.Feeder):
     def __iter__(self):
@@ -13,7 +13,7 @@ class Feeder(base.Feeder):
                 old = []
                 oldurl = '/dev/null'
             try:
-                new = nltk.clean_html(base.download(url).strip()).splitlines()
+                new = bs4.BeautifulSoup(base.download(url).strip()).get_text().splitlines()
             except Exception as e:
                 yield Exception('Error while loading %(url)s: %(err)s' % {
                     'url':url,
