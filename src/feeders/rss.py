@@ -16,7 +16,7 @@ class Feeder(base.Feeder):
                             yield base.Entry(n, e.title, \
                                '<p><b>%(title)s</b><br/><font size="-1">%(links)s</font></p>%(content)s' % {
                                    'title':rsscommon.get_title(e),
-                                   'links':'<br/>'.join(map(lambda x: '<a href="%(link)s">%(link)s</a>' % {'link':x}, links)),
+                                   'links':'<br/>'.join('<a href="%(link)s">%(link)s</a>' % {'link':x} for x in links),
                                    'content':rsscommon.get_content(e),
                                }, date=rsscommon.get_date(e), html=True)
                             seen.add(id)

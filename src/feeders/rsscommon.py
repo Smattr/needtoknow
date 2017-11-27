@@ -36,7 +36,8 @@ def get_links(entry):
     except:
         pass
     try:
-        map(lambda x: l.add(x.url), entry.links)
+        for link in entry.links:
+            l.add(link.url)
     except:
         pass
     return l
