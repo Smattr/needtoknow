@@ -49,6 +49,8 @@ def main():
         help='check whether we have an internet connection first')
     parser.add_argument('--config', default=os.path.expanduser('~/.needtoknow'),
         help='configuration location')
+    parser.add_argument('--dry-run', action='store_true',
+        help='scan feeds but don\'t send any updates')
     opts = parser.parse_args()
 
     log = logging.getLogger('needtoknow')
@@ -144,6 +146,9 @@ def main():
                         ret = -1
                 if skip:
                     continue
+                if opts.dry_run:
+                    log.info('  skipping send due to --dry-run')
+                    continue
                 try:
                     out.send(entry, log)
                 except Exception as e:
@@ -152,11 +157,12 @@ def main():
         except Exception as e:
             log.warning('  Feeder \'%s\' threw exception: %s' % (f, e))
 
-        log.info('  Committing resource changes...')
-        # Commit resource changes.
-        respath = get_resource_path(opts.config, f)
-        with bz2.BZ2File(respath, 'wb') as fobj:
-            six.moves.cPickle.dump(feeders[f].resource, fobj)
+        if not opts.dry_run:
+            log.info('  Committing resource changes...')
+            # Commit resource changes.
+            respath = get_resource_path(opts.config, f)
+            with bz2.BZ2File(respath, 'wb') as fobj:
+                six.moves.cPickle.dump(feeders[f].resource, fobj)
 
     out.disconnect()
 
