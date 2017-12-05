@@ -7,6 +7,10 @@ from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 from feeders.base import download
 
+# Number of bytes to allow embedded images to occupy (after this point, leave
+# linked images at their original URLs).
+EMBED_THRESHHOLD = 1024 * 1024 * 15
+
 class Sender(object):
     def __init__(self, conf):
         self.host = str(conf['host'])
@@ -43,12 +47,18 @@ class Sender(object):
             except:
                 pass
             if content is not None:
+                downloaded = 0
                 for index, img in enumerate(content.findAll('img',
                         src=re.compile('^https?://'))):
+                    if downloaded > EMBED_THRESHHOLD:
+                        break
                     try:
                         data = download(img['src'])
                     except urllib2.URLError:
                         continue
+                    downloaded += len(data)
+                    if downloaded > EMBED_THRESHHOLD:
+                        break
                     try:
                         att = MIMEImage(data)
                     except TypeError:
