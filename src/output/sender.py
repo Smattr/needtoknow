@@ -43,7 +43,7 @@ class Sender(object):
         if entry.html:
             content = None
             try:
-                content = bs4.BeautifulSoup(entry.content)
+                content = bs4.BeautifulSoup(entry.content, 'html.parser')
             except:
                 pass
             if content is not None:

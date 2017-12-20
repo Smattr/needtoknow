@@ -13,7 +13,7 @@ class Feeder(base.Feeder):
                 old = []
                 oldurl = '/dev/null'
             try:
-                new = bs4.BeautifulSoup(base.download(url).strip()).get_text().splitlines()
+                new = bs4.BeautifulSoup(base.download(url).strip(), 'html.parser').get_text().splitlines()
             except Exception as e:
                 yield Exception('Error while loading %(url)s: %(err)s' % {
                     'url':url,
