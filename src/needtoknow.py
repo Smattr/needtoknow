@@ -45,6 +45,8 @@ def main():
         help='configuration location')
     parser.add_argument('--dry-run', action='store_true',
         help='scan feeds but don\'t send any updates')
+    parser.add_argument('--debug', action='store_true',
+        help='instead of catching exceptions, let them dump a back trace')
     opts = parser.parse_args()
 
     log = logging.getLogger('needtoknow')
@@ -69,6 +71,8 @@ def main():
             raise TypeError('configuration values are not all strings or '
                 'numbers')
     except Exception as e:
+        if opts.debug:
+            raise
         log.error('Failed to parse config: %s' % e)
         return -1
 
@@ -81,6 +85,8 @@ def main():
                 for v in feeds.values()):
             raise TypeError('feed values are not all JSON objects')
     except Exception as e:
+        if opts.debug:
+            raise
         log.error('Failed to parse feeds: %s' % e)
         return -1
 
@@ -103,6 +109,8 @@ def main():
     try:
         out.connect()
     except Exception as e:
+        if opts.debug:
+            raise
         log.error('Failed to connect to mail server: %s' % e)
         return -1
 
@@ -119,6 +127,8 @@ def main():
             log.info(' Scanning %s...' % f)
             for entry in feeders[f]:
                 if isinstance(entry, Exception):
+                    if opts.debug:
+                        raise entry
                     log.warning('  Feeder \'%s\' threw exception: %s' % (f, entry))
                     ret = -1
                     continue
@@ -135,6 +145,8 @@ def main():
                             skip = True
                             break
                     except Exception as e:
+                        if opts.debug:
+                            raise
                         log.error('  Failed to run regex blacklist \'%s\' '
                             'against %s: %s' % (blacklist, entry.name, e))
                         ret = -1
@@ -146,9 +158,13 @@ def main():
                 try:
                     out.send(entry, log)
                 except Exception as e:
+                    if opts.debug:
+                        raise
                     log.error('  Failed to send update for %s \'%s\': %s' % (entry.name, entry.subject, e))
                     ret = -1
         except Exception as e:
+            if opts.debug:
+                raise
             log.warning('  Feeder \'%s\' threw exception: %s' % (f, e))
 
         if not opts.dry_run:
