@@ -44,7 +44,7 @@ class Feeder(base.Feeder):
                 # need to extract it.
                 last_commit, data = state
 
-                buffer = io.StringIO(data)
+                buffer = io.BytesIO(data)
                 with tarfile.open(fileobj=buffer) as t:
                     t.extractall(tmp)
 
@@ -111,7 +111,7 @@ class Feeder(base.Feeder):
             # Tar up the working directory to store in our resources. We don't
             # bother compressing it because the resources as a whole are
             # compressed.
-            buffer = io.StringIO()
+            buffer = io.BytesIO()
             with tarfile.open(fileobj=buffer, mode='w') as t:
                 for item in os.listdir(tmp):
                     path = os.path.join(tmp, item)
