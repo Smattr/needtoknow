@@ -153,7 +153,7 @@ def main():
                 if skip:
                     continue
                 if opts.dry_run:
-                    log.info('  skipping send due to --dry-run')
+                    log.info('  skipping \'%s\' send due to --dry-run' % entry.subject)
                     continue
                 try:
                     out.send(entry, log)
