@@ -3,8 +3,10 @@ import io, os, shutil, subprocess, tarfile, tempfile
 
 def run(cmd, cwd):
     p = subprocess.Popen(cmd, cwd=cwd, stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE, universal_newlines=True)
+        stderr=subprocess.PIPE)
     stdout, stderr = p.communicate()
+    stdout = stdout.decode('utf-8', 'replace')
+    stderr = stderr.decode('utf-8', 'replace')
     return p.returncode, stdout.strip(), stderr.strip()
 
 class Feeder(base.Feeder):
