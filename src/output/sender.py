@@ -114,4 +114,4 @@ class Sender(object):
             stamp = time.time()
         log.info('  Sending "%s"...' % entry.subject)
         self.conn.append('INBOX' if self.folder is None else self.folder, '',
-            imaplib.Time2Internaldate(stamp), m.as_string())
+            imaplib.Time2Internaldate(stamp), m.as_string().encode('utf-8', 'replace'))
