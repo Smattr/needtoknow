@@ -25,6 +25,12 @@ What you see is my attempt to solve this with some scripting. It's a pretty
 small codebase and (IMHO) pretty easily extensible via the feeders. Be aware it
 is currently in no way polished and lacks even basic error handling.
 
+# Dependencies
+
+* Python 3 (sorry, no Python 2 compatibility)
+* [BeautifulSoup](https://www.crummy.com/software/BeautifulSoup/)
+* [feedparser](https://pythonhosted.org/feedparser/)
+
 # Hacking
 
 Want to modify this code? Fork away. If you have any questions, let me know. If
