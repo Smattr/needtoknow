@@ -32,7 +32,10 @@ class Sender(object):
                 self.conn.close()
             except:
                 pass
-            self.conn.logout()
+            try:
+                self.conn.logout()
+            except:
+                pass
         self.conn = None
 
     def send(self, entry, log):
