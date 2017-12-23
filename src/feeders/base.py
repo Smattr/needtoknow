@@ -36,3 +36,10 @@ def download(url):
                 request = urllib.request.Request(url, headers={'User-Agent':''})
                 response = urllib.request.urlopen(request)
                 return response.read()
+
+# Sentinel class used by feeders to ask the main logic to write back state to
+# disk. Feeders should use this following processing of each feed. The purpose
+# of this is to minimise the resending of entries when a feeder is interrupted
+# part way through.
+class SyncRequest(object):
+    pass

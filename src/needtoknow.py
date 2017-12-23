@@ -2,6 +2,7 @@
 
 import argparse, bz2, collections, importlib, json, logging, numbers, os, pickle, re, socket, sys, urllib.error, urllib.request
 from output import sender
+from feeders.base import SyncRequest
 
 # How many times to attempt reconnecting to our output mailbox when the
 # connection is dropped.
@@ -122,6 +123,14 @@ def main():
 
     log.info('Looking for updates...')
     for f in feeders:
+
+        def commit_changes():
+            if not opts.dry_run:
+                log.info('  Committing resource changes...')
+                respath = get_resource_path(opts.config, f)
+                with bz2.BZ2File(respath, 'wb') as fobj:
+                    pickle.dump(feeders[f].resource, fobj)
+
         if feeders[f] is None:
             # We failed to load this feeder.
             continue
@@ -130,12 +139,17 @@ def main():
         try:
             log.info(' Scanning %s...' % f)
             for entry in feeders[f]:
+
                 if isinstance(entry, Exception):
                     if opts.debug:
                         raise entry
                     log.warning('  Feeder \'%s\' threw exception: %s' % (f, entry))
                     ret = -1
                     continue
+                elif isinstance(entry, SyncRequest):
+                    commit_changes()
+                    continue
+
                 # Check if we should discard this entry.
                 assert entry.name in feeders[f].feeds, \
                     'feeder \'%s\' yielded entry from unknown feed \'%s\'' % \
@@ -183,12 +197,7 @@ def main():
                 raise
             log.warning('  Feeder \'%s\' threw exception: %s' % (f, e))
 
-        if not opts.dry_run:
-            log.info('  Committing resource changes...')
-            # Commit resource changes.
-            respath = get_resource_path(opts.config, f)
-            with bz2.BZ2File(respath, 'wb') as fobj:
-                pickle.dump(feeders[f].resource, fobj)
+        commit_changes()
 
     out.disconnect()
 
