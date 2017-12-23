@@ -38,13 +38,13 @@ class Sender(object):
                 pass
         self.conn = None
 
-    def send(self, entry, log):
+    def send(self, entry, log, embed_images):
         assert self.conn is not None
 
         # If we're sending HTML, try to find and embed any referenced images.
         images = []
         body = entry.content
-        if entry.html:
+        if embed_images and entry.html:
             content = None
             try:
                 content = bs4.BeautifulSoup(entry.content, 'html.parser')

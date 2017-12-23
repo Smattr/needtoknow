@@ -178,7 +178,7 @@ def main():
                 try:
                     for i in range(RECONNECT_ATTEMPTS + 1):
                         try:
-                            out.send(entry, log)
+                            out.send(entry, log, i == 0)
                             break
                         except ConnectionResetError:
                             if i == RECONNECT_ATTEMPTS:
