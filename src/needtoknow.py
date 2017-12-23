@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 
-import argparse, bz2, collections, importlib, json, logging, numbers, os, pickle, re, sys, urllib.error, urllib.request
+import argparse, bz2, collections, importlib, json, logging, numbers, os, pickle, re, socket, sys, urllib.error, urllib.request
 from output import sender
+
+# How many times to attempt reconnecting to our output mailbox when the
+# connection is dropped.
+RECONNECT_ATTEMPTS = 3
 
 def get_resource_path(root, name):
     return os.path.join(root, 'cache/%s.pickle.bz2' % name)
@@ -156,7 +160,19 @@ def main():
                     log.info('  skipping \'%s\' send due to --dry-run' % entry.subject)
                     continue
                 try:
-                    out.send(entry, log)
+                    for i in range(RECONNECT_ATTEMPTS + 1):
+                        try:
+                            out.send(entry, log)
+                            break
+                        except ConnectionResetError:
+                            if i == RECONNECT_ATTEMPTS:
+                                raise
+                            log.warning('  connection reset by peer; reconnecting...')
+                        except (socket.timeout, TimeoutError):
+                            if i == RECONNECT_ATTEMPTS:
+                                raise
+                            log.warning('  socket timeout; reconnecting...')
+                        out.connect()
                 except Exception as e:
                     if opts.debug:
                         raise
