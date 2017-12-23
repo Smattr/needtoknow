@@ -128,6 +128,8 @@ def main():
             if not opts.dry_run:
                 log.info('  Committing resource changes...')
                 respath = get_resource_path(opts.config, f)
+                if not os.path.exists(os.path.dirname(respath)):
+                    os.makedirs(os.path.dirname(respath))
                 with bz2.BZ2File(respath, 'wb') as fobj:
                     pickle.dump(feeders[f].resource, fobj)
 
