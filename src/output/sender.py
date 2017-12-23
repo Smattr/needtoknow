@@ -43,6 +43,7 @@ class Sender(object):
 
         # If we're sending HTML, try to find and embed any referenced images.
         images = []
+        body = entry.content
         if entry.html:
             content = None
             try:
@@ -70,10 +71,10 @@ class Sender(object):
                         continue
                     images.append((index, att))
                     img['src'] = 'cid:image%d' % index
-                entry.content = str(content)
+                body = str(content)
 
         m = MIMEMultipart('related')
-        part = MIMEText(entry.content, 'html' if entry.html else 'plain',
+        part = MIMEText(body, 'html' if entry.html else 'plain',
             _charset='utf-8')
         m.attach(part)
         for name, data in entry.files:
