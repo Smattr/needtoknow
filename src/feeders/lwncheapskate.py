@@ -26,3 +26,4 @@ class Feeder(base.Feeder):
                         # 503 :(
                         pass
             self.resource[url] = seen
+            yield base.SyncRequest()

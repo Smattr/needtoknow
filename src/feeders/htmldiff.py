@@ -28,3 +28,4 @@ class Feeder(base.Feeder):
                 content = '\n'.join(lines)
                 yield base.Entry(n, '%s changes' % url, content)
             self.resource[url] = '\n'.join(new)
+            yield base.SyncRequest()

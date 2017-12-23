@@ -121,3 +121,4 @@ class Feeder(base.Feeder):
             shutil.rmtree(tmp)
 
             self.resource[(remote, branch)] = (last_commit, data)
+            yield base.SyncRequest()

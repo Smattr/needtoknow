@@ -34,3 +34,4 @@ class Feeder(base.Feeder):
                     datetime.datetime.now().strftime('%Y-%m-%d %H:%M')),
                     '<hr/>'.join(content), html=True)
             self.resource[url] = seen
+            yield base.SyncRequest()
