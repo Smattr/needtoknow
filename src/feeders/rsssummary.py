@@ -21,6 +21,9 @@ class Feeder(base.Feeder):
                         body += rsscommon.get_content(e)
                     if i.get('strip_images', 'no').lower() == 'yes':
                         body = re.sub(r'<img\b.*?/?>', '', body)
+                    if i.get('strip_iframes', 'no').lower() == 'yes':
+                        body = re.sub(r'<iframe\b.*?>.*?</iframe>', '',
+                               re.sub(r'<iframe\b.*?/>', '', body))
                     if i.get('strip_empty_links', 'no').lower() == 'yes':
                         body = re.sub(r'<a\s[^>]*></a>', '', body,
                             flags=re.MULTILINE)
