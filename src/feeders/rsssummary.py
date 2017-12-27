@@ -20,7 +20,7 @@ class Feeder(base.Feeder):
                     if i.get('description', 'no').lower() == 'yes':
                         body += rsscommon.get_content(e)
                     if i.get('strip_images', 'no').lower() == 'yes':
-                        body = re.sub(r'<img.*?/>', '', body)
+                        body = re.sub(r'<img\b.*?/?>', '', body)
                     if i.get('strip_empty_links', 'no').lower() == 'yes':
                         body = re.sub(r'<a\s[^>]*></a>', '', body,
                             flags=re.MULTILINE)
