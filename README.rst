@@ -9,7 +9,9 @@ nothing was quite right for me. I boiled my requirements down to a minimal list:
   of email filters that are more powerful than most feed-level filtering
   options?
 * SMTP_ output. I am sick of messing with MTAs_ to get my local mail forwarded
-  to an inbox I actually read.
+  to an inbox I actually read. Actually this subsequently evolved into IMAP_
+  output when I realised I could evade some unhelpful non-optional spam
+  filtering by directly copying entries into a mailbox over IMAP.
 * Text file configuration that I can check-in to `my utils repo`_. I don't like
   losing these things when my disk crashes.
 * Easily extensible. I had some ideas for RSS-like monitoring of non-RSS
@@ -18,6 +20,7 @@ nothing was quite right for me. I boiled my requirements down to a minimal list:
 .. _Blogtrottr: http://blogtrottr.com
 .. _Feedly: http://www.feedly.com/
 .. _`Google Reader`: http://www.google.com/reader
+.. _IMAP: https://en.wikipedia.org/wiki/Internet_Message_Access_Protocol
 .. _MTAs: https://en.wikipedia.org/wiki/Message_transfer_agent
 .. _`my utils repo`: https://github.com/Smattr/mattutils
 .. _rss2email: http://www.allthingsrss.com/rss2email/
