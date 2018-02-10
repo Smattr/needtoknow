@@ -120,6 +120,11 @@ def main():
             if s in opts.include or (opts.include == [] and s not in opts.exclude):
                 feeders[f].add(s, v)
 
+    # Set timeout on socket connections to 60 seconds. Without this, some
+    # platforms have no timeout (even on the kernel side) and socket connections
+    # can stall forever.
+    socket.setdefaulttimeout(60)
+
     out = sender.Sender(conf)
     try:
         out.connect()
