@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import argparse, bz2, collections, importlib, json, logging, numbers, os, pickle, re, socket, sys, urllib.error, urllib.request
+import argparse, bz2, collections, fcntl, importlib, json, logging, numbers, os, pickle, re, socket, sys, urllib.error, urllib.request
 from output import sender
 from feeders.base import SyncRequest
 
@@ -61,6 +61,16 @@ def main():
         log.setLevel(logging.INFO)
     else:
         log.setLevel(logging.WARNING)
+
+    # Check whether we're already running, to prevent multiple instances running
+    # at once. Multiple running instances can interfere with each other when
+    # saving state.
+    me = open(os.path.abspath(__file__), 'rt')
+    try:
+        fcntl.flock(me, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except OSError:
+        log.error('needtoknow is already running; exiting\n')
+        return -1
 
     if opts.check_connection and not online():
         log.info('no network connection; exiting')
