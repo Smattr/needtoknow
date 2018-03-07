@@ -198,11 +198,11 @@ def main():
                         except ConnectionResetError:
                             if i == RECONNECT_ATTEMPTS:
                                 raise
-                            log.warning('  connection reset by peer; reconnecting...')
+                            log.info('  connection reset by peer; reconnecting...')
                         except (socket.timeout, TimeoutError):
                             if i == RECONNECT_ATTEMPTS:
                                 raise
-                            log.warning('  socket timeout; reconnecting...')
+                            log.info('  socket timeout; reconnecting...')
                         out.connect()
                 except Exception as e:
                     if opts.debug:
