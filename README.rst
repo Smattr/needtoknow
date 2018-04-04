@@ -167,10 +167,9 @@ having a good day and I may do it for you :)
 
 Legal stuffs
 ------------
-All files in this repository are licensed under a Creative Commons
-Attribution-NonCommercial 3.0 Unported. You are free to reuse any of this code
-for any non-commercial purpose. For more information see
-https://creativecommons.org/licenses/by-nc/3.0/.
+All files in this repository are in the public domain. Use them in any way you
+wish. However, be aware that they come with no warranty. If you reuse this code,
+I assume you will read and understand it first.
 
 .. [#] If you actually do this with Paul Graham, I highly doubt he will answer
    your email.
