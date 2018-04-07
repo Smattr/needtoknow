@@ -1,4 +1,4 @@
-import bs4, email, imaplib, mimetypes, re, time, urllib.error
+import bs4, email, imaplib, mimetypes, re, time, urllib.error, uuid
 from email import encoders
 from email.mime.multipart import MIMEMultipart
 from email.mime.audio import MIMEAudio
@@ -25,7 +25,7 @@ class Sender(object):
         self.conn = imaplib.IMAP4_SSL(self.host, self.port)
         if self.login is not None:
             self.conn.login(self.login, self.password)
-        
+
     def disconnect(self):
         if self.conn:
             try:
@@ -52,8 +52,7 @@ class Sender(object):
                 pass
             if content is not None:
                 downloaded = 0
-                for index, img in enumerate(content.findAll('img',
-                        src=re.compile('^https?://'))):
+                for img in content.findAll('img', src=re.compile('^https?://')):
                     if downloaded > EMBED_THRESHHOLD:
                         break
                     try:
@@ -69,8 +68,9 @@ class Sender(object):
                         # If we can't guess the MIME subtype, just skip this
                         # one.
                         continue
-                    images.append((index, att))
-                    img['src'] = 'cid:image%d' % index
+                    cid = uuid.uuid4().hex
+                    images.append((cid, att))
+                    img['src'] = 'cid:image%s' % cid
                 body = str(content)
 
         m = MIMEMultipart('related')
@@ -98,8 +98,8 @@ class Sender(object):
             m.attach(payload)
 
         # Embed any referenced images.
-        for index, att in images:
-            att.add_header('Content-ID', '<image%d>' % index)
+        for cid, att in images:
+            att.add_header('Content-ID', '<image%s>' % cid)
             m.attach(att)
 
         m['To'] = 'Me' if self.login is None else self.login
