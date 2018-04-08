@@ -53,8 +53,6 @@ class Sender(object):
             if content is not None:
                 downloaded = 0
                 for img in content.findAll('img', src=re.compile('^https?://')):
-                    if downloaded > EMBED_THRESHHOLD:
-                        break
                     try:
                         data = download(img['src'])
                     except urllib.error.URLError:
