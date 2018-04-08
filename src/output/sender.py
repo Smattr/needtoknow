@@ -1,4 +1,4 @@
-import bs4, email, imaplib, mimetypes, re, time, urllib.error
+import bs4, email, hashlib, imaplib, mimetypes, re, time, urllib.error
 from email import encoders
 from email.mime.multipart import MIMEMultipart
 from email.mime.audio import MIMEAudio
@@ -42,7 +42,7 @@ class Sender(object):
         assert self.conn is not None
 
         # If we're sending HTML, try to find and embed any referenced images.
-        images = []
+        images = {}
         body = entry.content
         if embed_images and entry.html:
             content = None
@@ -52,8 +52,7 @@ class Sender(object):
                 pass
             if content is not None:
                 downloaded = 0
-                for index, img in enumerate(content.findAll('img',
-                        src=re.compile('^https?://'))):
+                for img in content.findAll('img', src=re.compile('^https?://')):
                     if downloaded > EMBED_THRESHHOLD:
                         break
                     try:
@@ -69,8 +68,13 @@ class Sender(object):
                         # If we can't guess the MIME subtype, just skip this
                         # one.
                         continue
-                    images.append((index, att))
-                    img['src'] = 'cid:image%d' % index
+                    # Generate a Content ID for the image, by which we will
+                    # reference it. We use its hash because this gives us a
+                    # pseudo globally unique ID (to comply with RFC 2111) while
+                    # still being deterministic.
+                    cid = hashlib.sha1(data).hexdigest()
+                    images[cid] = att
+                    img['src'] = 'cid:%s' % cid
                 body = str(content)
 
         m = MIMEMultipart('related')
@@ -98,8 +102,8 @@ class Sender(object):
             m.attach(payload)
 
         # Embed any referenced images.
-        for index, att in images:
-            att.add_header('Content-ID', '<image%d>' % index)
+        for cid, att in images.items():
+            att.add_header('Content-ID', '<%s>' % cid)
             m.attach(att)
 
         m['To'] = 'Me' if self.login is None else self.login
