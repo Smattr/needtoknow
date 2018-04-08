@@ -1,6 +1,6 @@
-import urllib.error, urllib.request
+import abc, urllib.error, urllib.request
 
-class Feeder(object):
+class Feeder(abc.ABC):
     def __init__(self, resource):
         self.resource = resource
         self.feeds = {}
@@ -8,6 +8,7 @@ class Feeder(object):
     def add(self, name, item):
         self.feeds[name] = item
 
+    @abc.abstractmethod
     def __iter__(self):
         raise NotImplementedError
 
