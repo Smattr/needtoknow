@@ -15,10 +15,7 @@ class Feeder(base.Feeder):
             try:
                 new = base.download(url).decode('utf-8', 'replace').strip().splitlines()
             except Exception as e:
-                yield Exception('Error while loading %(url)s: %(err)s' % {
-                    'url':url,
-                    'err':e,
-                })
+                yield Exception(f'Error while loading {url}: {e}')
                 continue
             lines = list(difflib.unified_diff(old, new, fromfile=oldurl,
                 tofile=url, lineterm=''))
@@ -26,6 +23,6 @@ class Feeder(base.Feeder):
                 lines = list(diffcommon.suppress_whitespace(lines))
             if len(lines) > 2:
                 content = '\n'.join(lines)
-                yield base.Entry(n, '%s changes' % url, content)
+                yield base.Entry(n, f'{url} changes', content)
             self.resource[url] = '\n'.join(new)
             yield base.SyncRequest()

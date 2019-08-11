@@ -23,7 +23,4 @@ class Feeder(base.Feeder):
                 self.resource[url] = seen
                 yield base.SyncRequest()
             except Exception as e:
-                yield Exception('Error from feed %(name)s: %(err)s' % {
-                    'name':n,
-                    'err':e,
-                })
+                yield Exception(f'Error from feed {n}: {e}')

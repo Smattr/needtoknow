@@ -33,7 +33,7 @@ is currently in no way polished and lacks even basic error handling.
 Dependencies
 ------------
 
-* Python 3 (sorry, no Python 2 compatibility)
+* Python ≥ 3.6
 * BeautifulSoup_
 * feedparser_
 

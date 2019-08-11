@@ -13,22 +13,16 @@ class Feeder(base.Feeder):
                         id = rsscommon.get_id(e)
                         if id not in seen:
                             links = rsscommon.get_links(e)
-                            yield base.Entry(n, e.title, \
+                            yield base.Entry(n, e.title,
                                '<p><b>%(title)s</b><br/><font size="-1">%(links)s</font></p>%(content)s' % {
                                    'title':rsscommon.get_title(e),
-                                   'links':'<br/>'.join('<a href="%(link)s">%(link)s</a>' % {'link':x} for x in links),
+                                   'links':'<br/>'.join(f'<a href="{x}">{x}</a>' for x in links),
                                    'content':rsscommon.get_content(e),
                                }, date=rsscommon.get_date(e), html=True)
                             seen.add(id)
                     except Exception as e:
-                        yield Exception('Error from feed %(name)s: %(err)s' % {
-                            'name':n,
-                            'err':e,
-                        })
+                        yield Exception(f'Error from feed {n}: {e}')
                 self.resource[url] = seen
                 yield base.SyncRequest()
             except Exception as e:
-                yield Exception('Error from feed %(name)s: %(err)s' % {
-                    'name':n,
-                    'err':e,
-                })
+                yield Exception(f'Error from feed {n}: {e}')

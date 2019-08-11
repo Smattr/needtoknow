@@ -9,13 +9,13 @@ from feeders.base import SyncRequest
 RECONNECT_ATTEMPTS = 3
 
 def get_resource_path(root, name):
-    return os.path.join(root, 'cache/%s.pickle.bz2' % name)
+    return os.path.join(root, f'cache/{name}.pickle.bz2')
 
 def construct_feeder(root, name, log):
     try:
-        mod = importlib.import_module('feeders.%s' % name)
+        mod = importlib.import_module(f'feeders.{name}')
     except Exception as e:
-        log.warning('failed to import feeder %s: %s' % (name, e))
+        log.warning(f'failed to import feeder {name}: {e}')
         return None
 
     respath = get_resource_path(root, name)
@@ -88,7 +88,7 @@ def main():
     except Exception as e:
         if opts.debug:
             raise
-        log.error('Failed to parse config: %s' % e)
+        log.error(f'Failed to parse config: {e}')
         return -1
 
     try:
@@ -102,7 +102,7 @@ def main():
     except Exception as e:
         if opts.debug:
             raise
-        log.error('Failed to parse feeds: %s' % e)
+        log.error(f'Failed to parse feeds: {e}')
         return -1
 
     feeders = {}
@@ -111,11 +111,11 @@ def main():
     for s, v in feeds.items():
         f = v.get('feeder')
         if f not in feeders:
-            log.info(' Loading %s...' % f)
+            log.info(f' Loading {f}...')
             feeders[f] = construct_feeder(opts.config, f, log)
 
         if feeders[f] is None:
-            log.warning(' Warning: No feeder named %s (referenced by %s).' % (f, s))
+            log.warning(f' Warning: No feeder named {f} (referenced by {s}).')
         else:
             if s in opts.include or (opts.include == [] and s not in opts.exclude):
                 feeders[f].add(s, v)
@@ -131,7 +131,7 @@ def main():
     except Exception as e:
         if opts.debug:
             raise
-        log.error('Failed to connect to mail server: %s' % e)
+        log.error(f'Failed to connect to mail server: {e}')
         return -1
 
     ret = 0
@@ -154,13 +154,13 @@ def main():
         if f in opts.disable or (opts.enable != [] and f not in opts.enable):
             continue
         try:
-            log.info(' Scanning %s...' % f)
+            log.info(f' Scanning {f}...')
             for entry in feeders[f]:
 
                 if isinstance(entry, Exception):
                     if opts.debug:
                         raise entry
-                    log.warning('  Feeder \'%s\' threw exception: %s' % (f, entry))
+                    log.warning(f'  Feeder \'{f}\' threw exception: {entry}')
                     ret = -1
                     continue
                 elif isinstance(entry, SyncRequest):
@@ -169,26 +169,24 @@ def main():
 
                 # Check if we should discard this entry.
                 assert entry.name in feeders[f].feeds, \
-                    'feeder \'%s\' yielded entry from unknown feed \'%s\'' % \
-                    (f, entry.name)
+                    f'feeder \'{f}\' yielded entry from unknown feed \'{entry.name}\''
                 skip = False
                 for blacklist in feeders[f].feeds[entry.name].get('blacklist', []):
                     try:
                         if re.search(blacklist, entry.subject) is not None:
-                            log.info('  Discarding \'[%s] %s\' as blacklisted' %
-                                (entry.name, entry.subject))
+                            log.info(f'  Discarding \'[{entry.name}] {entry.subject}\' as blacklisted')
                             skip = True
                             break
                     except Exception as e:
                         if opts.debug:
                             raise
-                        log.error('  Failed to run regex blacklist \'%s\' '
-                            'against %s: %s' % (blacklist, entry.name, e))
+                        log.error(f'  Failed to run regex blacklist \'{blacklist}\' '
+                            'against {entry.name}: {e}')
                         ret = -1
                 if skip:
                     continue
                 if opts.dry_run:
-                    log.info('  skipping \'%s\' send due to --dry-run' % entry.subject)
+                    log.info(f'  skipping \'{entry.subject}\' send due to --dry-run')
                     continue
                 try:
                     for i in range(RECONNECT_ATTEMPTS + 1):
@@ -207,12 +205,12 @@ def main():
                 except Exception as e:
                     if opts.debug:
                         raise
-                    log.error('  Failed to send update for %s \'%s\': %s' % (entry.name, entry.subject, e))
+                    log.error(f'  Failed to send update for {entry.name} \'{entry.subject}\': {e}')
                     ret = -1
         except Exception as e:
             if opts.debug:
                 raise
-            log.warning('  Feeder \'%s\' threw exception: %s' % (f, e))
+            log.warning(f'  Feeder \'{f}\' threw exception: {e}')
 
         commit_changes()
 

@@ -30,10 +30,7 @@ class Feeder(base.Feeder):
                 ret, _, stderr = run(['git', 'clone', '--bare', '--branch',
                     branch, remote, '.'], tmp)
                 if ret != 0:
-                    yield Exception('failed to clone %(url)s:\n%(err)s' % {
-                            'url':remote,
-                            'err':stderr,
-                        })
+                    yield Exception(f'failed to clone {remote}:\n{stderr}')
                     shutil.rmtree(tmp)
                     continue
 
@@ -49,14 +46,10 @@ class Feeder(base.Feeder):
                     t.extractall(tmp)
 
                 # Update the history in the working directory.
-                ret, _, stderr = run(['git', 'fetch', remote, '%s:%s' %
-                    (branch, branch)], tmp)
+                ret, _, stderr = run(['git', 'fetch', remote, f'{branch}:{branch}'], tmp)
                 if ret != 0:
                     yield Exception('failed to update temporary working '
-                        'directory for %(url)s:\n%(err)s' % {
-                            'url':remote,
-                            'err':stderr,
-                        })
+                        f'directory for {remote}:\n{stderr}')
                     shutil.rmtree(tmp)
                     continue
 
@@ -65,10 +58,7 @@ class Feeder(base.Feeder):
                 branch], tmp)
             if ret != 0:
                 yield Exception('failed to retrieve Git log of '
-                    '%(url)s:\n%(err)s' % {
-                        'url':remote,
-                        'err':stderr,
-                    })
+                    f'{remote}:\n{stderr}')
                 shutil.rmtree(tmp)
                 continue
 
@@ -83,21 +73,13 @@ class Feeder(base.Feeder):
                         '--format=%s', commit], tmp)
                     if ret != 0:
                         yield Exception('failed to retrieve summary for Git '
-                            'commit %(commit)s of %(url)s:\n%(err)s' % {
-                                'commit':commit,
-                                'url':remote,
-                                'err':stderr,
-                            })
+                            f'commit {commit} of {remote}:\n{stderr}')
                         continue
 
                     ret, diff, stderr = run(['git', 'show', commit], tmp)
                     if ret != 0:
                         yield Exception('failed to retrieve diff for Git '
-                            'commit %(commit)s of %(url)s:\n%(err)s' % {
-                                'commit':commit,
-                                'url':remote,
-                                'err':stderr,
-                            })
+                            f'commit {commit} of {remote}:\n{stderr}')
                         continue
 
                     yield base.Entry(n, summary, diff)
