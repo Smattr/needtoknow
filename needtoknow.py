@@ -20,7 +20,7 @@ def construct_feeder(root, name, log):
 
     respath = get_resource_path(root, name)
     if os.path.exists(respath):
-        with bz2.BZ2File(respath, 'rb') as f:
+        with bz2.open(respath, 'rb') as f:
             resource = pickle.load(f)
     else:
         resource = {}
@@ -145,7 +145,7 @@ def main():
                 respath = get_resource_path(opts.config, f)
                 if not os.path.exists(os.path.dirname(respath)):
                     os.makedirs(os.path.dirname(respath))
-                with bz2.BZ2File(respath, 'wb') as fobj:
+                with bz2.open(respath, 'wb') as fobj:
                     pickle.dump(feeders[f].resource, fobj)
 
         if feeders[f] is None:
