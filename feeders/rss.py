@@ -5,7 +5,7 @@ class Feeder(base.Feeder):
         for n, i in self.feeds.items():
             assert 'url' in i
             url = i['url']
-            seen = self.resource.get(url, set())
+            seen = [x for x in self.resource.get(url, [])]
             try:
                 entries = rsscommon.get_entries(url)
                 for e in entries:
@@ -19,7 +19,7 @@ class Feeder(base.Feeder):
                                    'links':'<br/>'.join(f'<a href="{x}">{x}</a>' for x in links),
                                    'content':rsscommon.get_content(e),
                                }, date=rsscommon.get_date(e), html=True)
-                            seen.add(id)
+                            seen.append(id)
                     except Exception as e:
                         yield Exception(f'Error from feed {n}: {e}')
                 self.resource[url] = seen

@@ -6,7 +6,7 @@ class Feeder(base.Feeder):
         for n, i in self.feeds.items():
             assert 'url' in i
             url = i['url']
-            seen = self.resource.get(url, set())
+            seen = [x for x in self.resource.get(url, [])]
             entries = rsscommon.get_entries(url)
             content = []
             for e in entries:
@@ -31,7 +31,7 @@ class Feeder(base.Feeder):
                         body = re.sub(r'<br\s*/?>\s*<br\s*/?>(\s*<br\s*/?>)+',
                             '<br/>', body, flags=re.MULTILINE)
                     content.append(body)
-                    seen.add(id)
+                    seen.append(id)
             if len(content) > 0:
                 yield base.Entry(n, '%s summary (%s)' % (n,
                     datetime.datetime.now().strftime('%Y-%m-%d %H:%M')),
