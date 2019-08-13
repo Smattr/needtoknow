@@ -11,7 +11,7 @@ class Feeder(base.Feeder):
         for n, i in self.feeds.items():
             assert 'url' in i
             url = i['url']
-            seen = self.resource.get(url, set())
+            seen = [x for x in self.resource.get(url, [])]
             entries = rsscommon.get_entries(url)
             for e in entries:
                 id = rsscommon.get_id(e)
@@ -21,7 +21,7 @@ class Feeder(base.Feeder):
                         urllib.request.urlopen(e.link)
                         # No 503 :)
                         yield base.Entry(n, e.title, rsscommon.get_content(e), html=True)
-                        seen.add(id)
+                        seen.append(id)
                     except:
                         # 503 :(
                         pass

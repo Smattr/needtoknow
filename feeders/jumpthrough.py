@@ -6,7 +6,7 @@ class Feeder(base.Feeder):
         for n, i in self.feeds.items():
             assert 'url' in i
             url = i['url']
-            seen = self.resource.get(url, set())
+            seen = [x for x in self.resource.get(url, [])]
             try:
                 entries = rsscommon.get_entries(url)
                 for e in entries:
@@ -19,7 +19,7 @@ class Feeder(base.Feeder):
                         except urllib.error.HTTPError:
                             # Suppress 404s from broken links.
                             pass
-                        seen.add(id)
+                        seen.append(id)
                 self.resource[url] = seen
                 yield base.SyncRequest()
             except Exception as e:
