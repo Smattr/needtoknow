@@ -79,7 +79,7 @@ def main():
     try:
         with open(os.path.join(opts.config, 'conf.json')) as f:
             conf = json.load(f)
-        if not isinstance(conf, collections.Mapping):
+        if not isinstance(conf, collections.abc.Mapping):
             raise TypeError('configuration is not a JSON object')
         if not all(isinstance(v, (str, numbers.Integral))
                 for v in conf.values()):
@@ -94,9 +94,9 @@ def main():
     try:
         with open(os.path.join(opts.config, 'feeds.json')) as f:
             feeds = json.load(f)
-        if not isinstance(feeds, collections.Mapping):
+        if not isinstance(feeds, collections.abc.Mapping):
             raise TypeError('feeds is not a JSON object')
-        if not all(isinstance(v, collections.Mapping)
+        if not all(isinstance(v, collections.abc.Mapping)
                 for v in feeds.values()):
             raise TypeError('feed values are not all JSON objects')
     except Exception as e:
