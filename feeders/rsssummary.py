@@ -1,5 +1,5 @@
 from . import base, rsscommon
-import cgi, datetime, re
+import html, datetime, re
 
 class Feeder(base.Feeder):
     def __iter__(self):
@@ -15,7 +15,7 @@ class Feeder(base.Feeder):
                     links = rsscommon.get_links(e)
                     body = '<p><b>%(title)s</b><br/><font size="-1">%(links)s</font></p>' % {
                         'title':rsscommon.get_title(e),
-                        'links':'<br/>'.join(f'<a href="{x}">{cgi.escape(x)}</a>' for x in links),
+                        'links':'<br/>'.join(f'<a href="{x}">{html.escape(x)}</a>' for x in links),
                     }
                     if i.get('description', 'no').lower() == 'yes':
                         body += rsscommon.get_content(e)
