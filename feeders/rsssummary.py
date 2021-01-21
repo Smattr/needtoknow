@@ -7,7 +7,8 @@ class Feeder(base.Feeder):
             assert 'url' in i
             url = i['url']
             seen = [x for x in self.resource.get(url, [])]
-            entries = rsscommon.get_entries(url)
+            feed = rsscommon.get_feed(url)
+            entries = rsscommon.get_entries(feed)
             content = []
             for e in entries:
                 id = rsscommon.get_id(e)

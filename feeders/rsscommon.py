@@ -5,8 +5,26 @@ imported as a standalone feeder.
 
 import html, feedparser
 
-def get_entries(url):
-    return feedparser.parse(url).entries
+def get_feed(url, etag=None, modified=None):
+
+    kwargs = {}
+    if etag is not None:
+        kwargs['etag'] = etag
+    if modified is not None:
+        kwargs['modified'] = modified
+
+    response = feedparser.parse(url, **kwargs)
+
+    if getattr(response, 'status', None) == 304: # “Not Modified”
+        response.etag = etag
+        response.modified = modified
+
+    return response
+
+def get_entries(response):
+    if getattr(response, 'status', None) == 304:
+      return []
+    return response.entries
 
 def get_id(entry):
     try:

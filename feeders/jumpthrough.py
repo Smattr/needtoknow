@@ -8,7 +8,8 @@ class Feeder(base.Feeder):
             url = i['url']
             seen = [x for x in self.resource.get(url, [])]
             try:
-                entries = rsscommon.get_entries(url)
+                feed = rsscommon.get_feed(url)
+                entries = rsscommon.get_entries(feed)
                 for e in entries:
                     id = rsscommon.get_id(e)
                     if id not in seen:
