@@ -16,7 +16,7 @@ class Feeder(base.Feeder):
                 etag = None
                 modified = None
                 seen = data[:]
-            feed = rsscommon.get_feed(url)
+            feed = rsscommon.get_feed(url, etag, modified)
             entries = rsscommon.get_entries(feed)
             content = []
             for e in entries:
