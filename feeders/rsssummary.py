@@ -25,6 +25,17 @@ class Feeder(base.Feeder):
                 id = rsscommon.get_id(e)
                 if id not in seen:
                     links = rsscommon.get_links(e)
+
+                    # do any of the links match something the user wanted to
+                    # suppress?
+                    skip = False
+                    for regex in i.get('skip_urls', []):
+                        if any(re.match(regex, l) for l in links):
+                            skip = True
+                            break
+                    if skip:
+                        continue
+
                     body = '<p><b>%(title)s</b><br/><font size="-1">%(links)s</font></p>' % {
                         'title':rsscommon.get_title(e),
                         'links':'<br/>'.join(f'<a href="{x}">{html.escape(x)}</a>' for x in links),
