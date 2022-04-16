@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 
-import argparse, bz2, collections, fcntl, importlib, json, logging, numbers, os, pickle, re, socket, sys, urllib.error, urllib.request
+import argparse, bz2, collections, fcntl, importlib, json, logging, numbers, pickle, re, socket, sys, urllib.error, urllib.request
 from output import sender
+from pathlib import Path
 from feeders.base import SyncRequest
 
 # How many times to attempt reconnecting to our output mailbox when the
 # connection is dropped.
 RECONNECT_ATTEMPTS = 3
 
-def get_resource_path(root, name):
-    return os.path.join(root, f'cache/{name}.pickle.bz2')
+def get_resource_path(root: str, name: str) -> Path:
+    return Path(root) / f'cache/{name}.pickle.bz2'
 
 def construct_feeder(root, name, log):
     try:
@@ -19,7 +20,7 @@ def construct_feeder(root, name, log):
         return None
 
     respath = get_resource_path(root, name)
-    if os.path.exists(respath):
+    if respath.exists():
         with bz2.open(respath, 'rb') as f:
             resource = pickle.load(f)
     else:
@@ -46,7 +47,8 @@ def main():
         help='include a particular feed by name')
     parser.add_argument('--check-connection', action='store_true',
         help='check whether we have an internet connection first')
-    parser.add_argument('--config', default=os.path.expanduser('~/.needtoknow'),
+    parser.add_argument('--config',
+        default=str(Path('~/.needtoknow').expanduser()),
         help='configuration location')
     parser.add_argument('--dry-run', action='store_true',
         help='scan feeds but don\'t send any updates')
@@ -65,7 +67,7 @@ def main():
     # Check whether we're already running, to prevent multiple instances running
     # at once. Multiple running instances can interfere with each other when
     # saving state.
-    me = open(os.path.abspath(__file__), 'rt')
+    me = open(Path(__file__).resolve(), 'rt')
     try:
         fcntl.flock(me, fcntl.LOCK_EX | fcntl.LOCK_NB)
     except OSError:
@@ -77,7 +79,7 @@ def main():
         return 0
 
     try:
-        with open(os.path.join(opts.config, 'conf.json')) as f:
+        with open(Path(opts.config) / 'conf.json', 'rt', encoding='utf-8') as f:
             conf = json.load(f)
         if not isinstance(conf, collections.abc.Mapping):
             raise TypeError('configuration is not a JSON object')
@@ -92,7 +94,8 @@ def main():
         return -1
 
     try:
-        with open(os.path.join(opts.config, 'feeds.json')) as f:
+        with open(Path(opts.config) / 'feeds.json', 'rt',
+                  encoding='utf-8') as f:
             feeds = json.load(f)
         if not isinstance(feeds, collections.abc.Mapping):
             raise TypeError('feeds is not a JSON object')
@@ -143,8 +146,7 @@ def main():
             if not opts.dry_run:
                 log.info('  Committing resource changes...')
                 respath = get_resource_path(opts.config, f)
-                if not os.path.exists(os.path.dirname(respath)):
-                    os.makedirs(os.path.dirname(respath))
+                respath.parent.mkdir(exist_ok=True)
                 with bz2.open(respath, 'wb') as fobj:
                     pickle.dump(feeders[f].resource, fobj)
 

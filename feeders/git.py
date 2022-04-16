@@ -1,5 +1,6 @@
 from . import base
-import io, os, shutil, subprocess, tarfile, tempfile
+import io, shutil, subprocess, tarfile, tempfile
+from pathlib import Path
 
 def run(cmd, cwd):
     p = subprocess.Popen(cmd, cwd=cwd, stdout=subprocess.PIPE,
@@ -95,9 +96,8 @@ class Feeder(base.Feeder):
             # compressed.
             buffer = io.BytesIO()
             with tarfile.open(fileobj=buffer, mode='w') as t:
-                for item in os.listdir(tmp):
-                    path = os.path.join(tmp, item)
-                    t.add(path, item)
+                for item in Path(tmp).iterdir():
+                    t.add(item, item.name)
             data = buffer.getvalue()
 
             shutil.rmtree(tmp)
