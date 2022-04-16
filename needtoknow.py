@@ -185,16 +185,16 @@ def main():
                 assert entry.name in feeders[f].feeds, \
                     f'feeder \'{f}\' yielded entry from unknown feed \'{entry.name}\''
                 skip = False
-                for blacklist in feeders[f].feeds[entry.name].get('blacklist', []):
+                for blocklist in feeders[f].feeds[entry.name].get('blocklist', []):
                     try:
-                        if re.search(blacklist, entry.subject) is not None:
-                            log.info(f'  Discarding \'[{entry.name}] {entry.subject}\' as blacklisted')
+                        if re.search(blocklist, entry.subject) is not None:
+                            log.info(f'  Discarding \'[{entry.name}] {entry.subject}\' as blocklisted')
                             skip = True
                             break
                     except Exception as e:
                         if opts.debug:
                             raise
-                        log.error(f'  Failed to run regex blacklist \'{blacklist}\' '
+                        log.error(f'  Failed to run regex blocklist \'{blocklist}\' '
                             'against {entry.name}: {e}')
                         ret = -1
                 if skip:
