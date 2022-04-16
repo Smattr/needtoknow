@@ -1,6 +1,18 @@
 #!/usr/bin/env python3
 
-import argparse, bz2, collections, fcntl, importlib, json, logging, numbers, pickle, re, socket, sys, urllib.error, urllib.request
+import argparse
+import bz2
+import collections
+import fcntl
+import importlib
+import json
+import logging
+import numbers
+import pickle
+import re
+import socket
+import sys
+import urllib.error, urllib.request
 from output import sender
 from pathlib import Path
 from feeders.base import SyncRequest

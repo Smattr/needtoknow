@@ -1,4 +1,11 @@
-import bs4, email, hashlib, imaplib, mimetypes, re, time, urllib.error
+import bs4
+import email
+import hashlib
+import imaplib
+import mimetypes
+import re
+import time
+import urllib.error
 from email import encoders
 from email.mime.multipart import MIMEMultipart
 from email.mime.audio import MIMEAudio

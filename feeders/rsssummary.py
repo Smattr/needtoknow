@@ -1,5 +1,7 @@
 from . import base, rsscommon
-import html, datetime, re
+import datetime
+import html
+import re
 
 class Feeder(base.Feeder):
     def __iter__(self):
