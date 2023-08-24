@@ -159,8 +159,10 @@ def main():
                 log.info('  Committing resource changes...')
                 respath = get_resource_path(opts.config, f)
                 respath.parent.mkdir(exist_ok=True)
-                with bz2.open(respath, 'wb') as fobj:
+                tmp = Path(f'{respath}.tmp')
+                with bz2.open(tmp, 'wb') as fobj:
                     pickle.dump(feeders[f].resource, fobj)
+                tmp.rename(respath)
 
         if feeders[f] is None:
             # We failed to load this feeder.
