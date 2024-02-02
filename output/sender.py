@@ -3,6 +3,7 @@ import hashlib
 import imaplib
 import mimetypes
 import re
+import ssl
 import time
 import urllib.error
 from email import encoders
@@ -32,7 +33,9 @@ class Sender(object):
 
     def connect(self):
         self.disconnect()
-        self.conn = imaplib.IMAP4_SSL(self.host, self.port)
+        self.conn = imaplib.IMAP4_SSL(
+            self.host, self.port, ssl_context=ssl.create_default_context()
+        )
         if self.login is not None:
             self.conn.login(self.login, self.password)
 
