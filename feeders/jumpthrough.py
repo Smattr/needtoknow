@@ -1,5 +1,7 @@
-from . import base, rsscommon
 import urllib.error
+
+from . import base, rsscommon
+
 
 class Feeder(base.Feeder):
     def __iter__(self):

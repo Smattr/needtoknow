@@ -1,7 +1,9 @@
-from . import base, rsscommon
 import datetime
 import html
 import re
+
+from . import base, rsscommon
+
 
 class Feeder(base.Feeder):
     def __iter__(self):

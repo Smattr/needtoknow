@@ -1,5 +1,7 @@
-from . import diffcommon, base
 import difflib
+
+from . import base, diffcommon
+
 
 class Feeder(base.Feeder):
     def __iter__(self):

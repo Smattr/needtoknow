@@ -1,5 +1,6 @@
 from . import base, rsscommon
 
+
 class Feeder(base.Feeder):
     def __iter__(self):
         for n, i in self.feeds.items():

@@ -1,10 +1,12 @@
-from . import base
 import io
 import shutil
 import subprocess
 import tarfile
 import tempfile
 from pathlib import Path
+
+from . import base
+
 
 def run(cmd, cwd):
     p = subprocess.Popen(cmd, cwd=cwd, stdout=subprocess.PIPE,

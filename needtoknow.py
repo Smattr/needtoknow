@@ -12,10 +12,12 @@ import pickle
 import re
 import socket
 import sys
-import urllib.error, urllib.request
-from output import sender
+import urllib.error
+import urllib.request
 from pathlib import Path
+
 from feeders.base import SyncRequest
+from output import sender
 
 # How many times to attempt reconnecting to our output mailbox when the
 # connection is dropped.

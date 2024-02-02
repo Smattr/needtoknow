@@ -1,5 +1,7 @@
 import abc
-import urllib.error, urllib.request
+import urllib.error
+import urllib.request
+
 
 class Feeder(abc.ABC):
     def __init__(self, resource):

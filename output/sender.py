@@ -1,4 +1,3 @@
-import bs4
 import email
 import hashlib
 import imaplib
@@ -7,11 +6,14 @@ import re
 import time
 import urllib.error
 from email import encoders
-from email.mime.multipart import MIMEMultipart
 from email.mime.audio import MIMEAudio
-from email.mime.image import MIMEImage
 from email.mime.base import MIMEBase
+from email.mime.image import MIMEImage
+from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+
+import bs4
+
 from feeders.base import download
 
 # Number of bytes to allow embedded images to occupy (after this point, leave

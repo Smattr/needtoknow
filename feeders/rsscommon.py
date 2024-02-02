@@ -3,8 +3,10 @@ Functionality common to RSS-based feeders. This file is not intended to be
 imported as a standalone feeder.
 '''
 
-import feedparser
 import html
+
+import feedparser
+
 
 def get_feed(url, etag=None, modified=None):
 
