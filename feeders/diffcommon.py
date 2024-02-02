@@ -1,7 +1,7 @@
 def suppress_whitespace(lines):
-    '''
+    """
     Remove hunks from a unified diff that only contain white space changes.
-    '''
+    """
 
     # States for following state machine.
     IDLE, IN_HUNK = list(range(2))
@@ -15,7 +15,7 @@ def suppress_whitespace(lines):
         if state == IDLE:
             assert len(accumulated) == 0
 
-            if line.startswith('@@'):
+            if line.startswith("@@"):
                 # Encountered a new hunk.
                 accumulated = [line]
                 state = IN_HUNK
@@ -29,15 +29,16 @@ def suppress_whitespace(lines):
             assert state == IN_HUNK
             assert len(accumulated) > 0
 
-            if (line.startswith('+') or line.startswith('-')) and \
-                    line[1:].strip() != '':
+            if (line.startswith("+") or line.startswith("-")) and line[
+                1:
+            ].strip() != "":
                 # This is a non-empty change line. Decide to keep this hunk.
                 for a in accumulated:
                     yield a
                 accumulated = []
                 state = IDLE
 
-            elif line.startswith('@@'):
+            elif line.startswith("@@"):
                 # Encountered a new hunk without finding anything interesting in
                 # the current hunk. Ditch the current hunk (the prior contents
                 # of `accumulated`.

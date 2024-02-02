@@ -20,13 +20,14 @@ from feeders.base import download
 # linked images at their original URLs).
 EMBED_THRESHHOLD = 1024 * 1024 * 15
 
+
 class Sender(object):
     def __init__(self, conf):
-        self.host = str(conf['host'])
-        self.port = str(conf.get('port', '993'))
-        self.login = str(conf['login'])
-        self.password = str(conf['password'])
-        self.folder = str(conf.get('folder', 'INBOX'))
+        self.host = str(conf["host"])
+        self.port = str(conf.get("port", "993"))
+        self.login = str(conf["login"])
+        self.password = str(conf["password"])
+        self.folder = str(conf.get("folder", "INBOX"))
         self.conn = None
 
     def connect(self):
@@ -34,7 +35,7 @@ class Sender(object):
         self.conn = imaplib.IMAP4_SSL(self.host, self.port)
         if self.login is not None:
             self.conn.login(self.login, self.password)
-        
+
     def disconnect(self):
         if self.conn:
             try:
@@ -56,14 +57,14 @@ class Sender(object):
         if embed_images and entry.html:
             content = None
             try:
-                content = bs4.BeautifulSoup(entry.content, 'html.parser')
+                content = bs4.BeautifulSoup(entry.content, "html.parser")
             except:
                 pass
             if content is not None:
                 downloaded = 0
-                for img in content.findAll('img', src=re.compile('^https?://')):
+                for img in content.findAll("img", src=re.compile("^https?://")):
                     try:
-                        data = download(img['src'])
+                        data = download(img["src"])
                     except urllib.error.URLError:
                         continue
                     downloaded += len(data)
@@ -81,52 +82,55 @@ class Sender(object):
                     # still being deterministic.
                     cid = hashlib.sha1(data).hexdigest()
                     images[cid] = att
-                    img['src'] = 'cid:%s' % cid
+                    img["src"] = "cid:%s" % cid
                 body = str(content)
 
-        m = MIMEMultipart('related')
-        part = MIMEText(body, 'html' if entry.html else 'plain',
-            _charset='utf-8')
+        m = MIMEMultipart("related")
+        part = MIMEText(body, "html" if entry.html else "plain", _charset="utf-8")
         m.attach(part)
         for name, data in entry.files:
             content_type, encoding = mimetypes.guess_type(name)
             if content_type is None or encoding is not None:
                 # Unknown content type or compressed.
-                content_type = 'application/octet-stream'
-            type, subtype = content_type.split('/', 1)
-            if type == 'text':
+                content_type = "application/octet-stream"
+            type, subtype = content_type.split("/", 1)
+            if type == "text":
                 payload = MIMEText(data, _subtype=subtype)
-            elif type == 'image':
+            elif type == "image":
                 payload = MIMEImage(data, _subtype=subtype)
-            elif type == 'audio':
+            elif type == "audio":
                 payload = MIMEAudio(data, _subtype=subtype)
             else:
                 # Unknown content.
                 payload = MIMEBase(type, subtype)
                 payload.set_payload(data)
                 encoders.encode_base64(payload)
-            payload.add_header('Content-Disposition', 'attachment', filename=name)
+            payload.add_header("Content-Disposition", "attachment", filename=name)
             m.attach(payload)
 
         # Embed any referenced images.
         for cid, att in images.items():
-            att.add_header('Content-ID', '<%s>' % cid)
+            att.add_header("Content-ID", "<%s>" % cid)
             m.attach(att)
 
-        m['To'] = 'Me' if self.login is None else self.login
+        m["To"] = "Me" if self.login is None else self.login
         # Make the sender look like a valid email if it does not already. This
         # has no effect in most email clients, but the GMail web and phone apps
         # insist on labelling such emails "unknown sender".
-        if re.search(r'<.+@.+>', entry.name) is None:
-            m['From'] = '%s <example@example.com>' % entry.name
+        if re.search(r"<.+@.+>", entry.name) is None:
+            m["From"] = "%s <example@example.com>" % entry.name
         else:
-            m['From'] = entry.name
-        m['Subject'] = entry.subject
+            m["From"] = entry.name
+        m["Subject"] = entry.subject
         if entry.date:
             stamp = time.mktime(entry.date)
-            m['Date'] = email.utils.formatdate(stamp)
+            m["Date"] = email.utils.formatdate(stamp)
         else:
             stamp = time.time()
         log.info('  Sending "%s"...' % entry.subject)
-        self.conn.append('INBOX' if self.folder is None else self.folder, '',
-            imaplib.Time2Internaldate(stamp), m.as_string().encode('utf-8', 'replace'))
+        self.conn.append(
+            "INBOX" if self.folder is None else self.folder,
+            "",
+            imaplib.Time2Internaldate(stamp),
+            m.as_string().encode("utf-8", "replace"),
+        )

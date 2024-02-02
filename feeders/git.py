@@ -9,22 +9,21 @@ from . import base
 
 
 def run(cmd, cwd):
-    p = subprocess.Popen(cmd, cwd=cwd, stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE)
+    p = subprocess.Popen(cmd, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = p.communicate()
-    stdout = stdout.decode('utf-8', 'replace')
-    stderr = stderr.decode('utf-8', 'replace')
+    stdout = stdout.decode("utf-8", "replace")
+    stderr = stderr.decode("utf-8", "replace")
     return p.returncode, stdout.strip(), stderr.strip()
 
-class Feeder(base.Feeder):
 
+class Feeder(base.Feeder):
     def __iter__(self):
         for n, i in self.feeds.items():
 
-            assert 'url' in i
-            remote = i['url']
+            assert "url" in i
+            remote = i["url"]
 
-            branch = i.get('branch', 'master')
+            branch = i.get("branch", "master")
 
             state = self.resource.get((remote, branch))
 
@@ -34,10 +33,11 @@ class Feeder(base.Feeder):
             if state is None:
                 # This is the first time we've encountered this repository. We
                 # need to clone it.
-                ret, _, stderr = run(['git', 'clone', '--bare', '--branch',
-                    branch, remote, '.'], tmp)
+                ret, _, stderr = run(
+                    ["git", "clone", "--bare", "--branch", branch, remote, "."], tmp
+                )
                 if ret != 0:
-                    yield Exception(f'failed to clone {remote}:\n{stderr}')
+                    yield Exception(f"failed to clone {remote}:\n{stderr}")
                     shutil.rmtree(tmp)
                     continue
 
@@ -53,19 +53,23 @@ class Feeder(base.Feeder):
                     t.extractall(tmp)
 
                 # Update the history in the working directory.
-                ret, _, stderr = run(['git', 'fetch', remote, f'{branch}:{branch}'], tmp)
+                ret, _, stderr = run(
+                    ["git", "fetch", remote, f"{branch}:{branch}"], tmp
+                )
                 if ret != 0:
-                    yield Exception('failed to update temporary working '
-                        f'directory for {remote}:\n{stderr}')
+                    yield Exception(
+                        "failed to update temporary working "
+                        f"directory for {remote}:\n{stderr}"
+                    )
                     shutil.rmtree(tmp)
                     continue
 
             # Now retrieve the log and look for new commits.
-            ret, stdout, stderr = run(['git', 'log', '--reverse', '--pretty=%H',
-                branch], tmp)
+            ret, stdout, stderr = run(
+                ["git", "log", "--reverse", "--pretty=%H", branch], tmp
+            )
             if ret != 0:
-                yield Exception('failed to retrieve Git log of '
-                    f'{remote}:\n{stderr}')
+                yield Exception("failed to retrieve Git log of " f"{remote}:\n{stderr}")
                 shutil.rmtree(tmp)
                 continue
 
@@ -76,17 +80,22 @@ class Feeder(base.Feeder):
                 if last_commit is None or seen_last_commit:
                     # This is a new commit.
 
-                    ret, summary, stderr = run(['git', 'log', '-n', '1',
-                        '--format=%s', commit], tmp)
+                    ret, summary, stderr = run(
+                        ["git", "log", "-n", "1", "--format=%s", commit], tmp
+                    )
                     if ret != 0:
-                        yield Exception('failed to retrieve summary for Git '
-                            f'commit {commit} of {remote}:\n{stderr}')
+                        yield Exception(
+                            "failed to retrieve summary for Git "
+                            f"commit {commit} of {remote}:\n{stderr}"
+                        )
                         continue
 
-                    ret, diff, stderr = run(['git', 'show', commit], tmp)
+                    ret, diff, stderr = run(["git", "show", commit], tmp)
                     if ret != 0:
-                        yield Exception('failed to retrieve diff for Git '
-                            f'commit {commit} of {remote}:\n{stderr}')
+                        yield Exception(
+                            "failed to retrieve diff for Git "
+                            f"commit {commit} of {remote}:\n{stderr}"
+                        )
                         continue
 
                     yield base.Entry(n, summary, diff)
@@ -101,7 +110,7 @@ class Feeder(base.Feeder):
             # bother compressing it because the resources as a whole are
             # compressed.
             buffer = io.BytesIO()
-            with tarfile.open(fileobj=buffer, mode='w') as t:
+            with tarfile.open(fileobj=buffer, mode="w") as t:
                 for item in Path(tmp).iterdir():
                     t.add(item, item.name)
             data = buffer.getvalue()
