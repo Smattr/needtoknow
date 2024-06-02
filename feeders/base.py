@@ -4,9 +4,11 @@ import urllib.request
 
 
 class Feeder(abc.ABC):
-    def __init__(self, resource):
+    def __init__(self, resource, log, debug: bool):
         self.resource = resource
         self.feeds = {}
+        self.log = log
+        self.debug = debug
 
     def add(self, name, item):
         self.feeds[name] = item

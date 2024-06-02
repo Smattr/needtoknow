@@ -28,7 +28,7 @@ def get_resource_path(root: str, name: str) -> Path:
     return Path(root) / f"cache/{name}.pickle.bz2"
 
 
-def construct_feeder(root, name, log):
+def construct_feeder(root, name, log, debug: bool):
     try:
         mod = importlib.import_module(f"feeders.{name}")
     except Exception as e:
@@ -42,7 +42,7 @@ def construct_feeder(root, name, log):
     else:
         resource = {}
 
-    return mod.Feeder(resource)
+    return mod.Feeder(resource, log, debug)
 
 
 def online():
@@ -158,7 +158,7 @@ def main():
         f = v.get("feeder")
         if f not in feeders:
             log.info(f" Loading {f}...")
-            feeders[f] = construct_feeder(opts.config, f, log)
+            feeders[f] = construct_feeder(opts.config, f, log, opts.debug)
 
         if feeders[f] is None:
             log.warning(f" Warning: No feeder named {f} (referenced by {s}).")
