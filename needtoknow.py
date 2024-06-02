@@ -107,7 +107,10 @@ def main():
     log.addHandler(logging.StreamHandler(sys.stderr))
     # Determine whether we are running interactively.
     if sys.stdout.isatty():
-        log.setLevel(logging.INFO)
+        if opts.debug:
+            log.setLevel(logging.DEBUG)
+        else:
+            log.setLevel(logging.INFO)
     else:
         log.setLevel(logging.WARNING)
 
