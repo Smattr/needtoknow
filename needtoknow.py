@@ -4,6 +4,7 @@ import argparse
 import bz2
 import collections
 import fcntl
+import imaplib
 import importlib
 import json
 import logging
@@ -252,6 +253,10 @@ def main():
                             if i == RECONNECT_ATTEMPTS:
                                 raise
                             log.info("  connection reset by peer; reconnecting...")
+                        except imaplib.IMAP4.error as err:
+                            if i == RECONNECT_ATTEMPTS:
+                                raise
+                            log.info(f"  IMAP4 error {err}; reconnecting...")
                         except (socket.timeout, TimeoutError):
                             if i == RECONNECT_ATTEMPTS:
                                 raise
