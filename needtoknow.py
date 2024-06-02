@@ -232,7 +232,7 @@ def main():
                             raise
                         log.error(
                             f"  Failed to run regex blocklist '{blocklist}' "
-                            "against {entry.name}: {e}"
+                            f"against {entry.name}: {e}"
                         )
                         ret = -1
                 if skip:
