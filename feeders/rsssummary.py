@@ -35,13 +35,29 @@ class Feeder(base.Feeder):
                         if any(re.match(regex, l) for l in links):
                             skip = True
                             break
+                    # does the title match something on the block list?
+                    title = rsscommon.get_title(e)
+                    for block in i.get("blocklist", []):
+                        try:
+                            self.log.debug(f"  checking {title} against regex {block}")
+                            if re.search(block, title) is not None:
+                                self.log.info(f"  Discarding [{n}] {title} as blocklisted")
+                                skip = True
+                                break
+                        except Exception as e:
+                            if self.debug:
+                                raise
+                            self.log.warning(
+                                f"  Failed to run regex blocklist '{block}' "
+                                f"against {n}: {title}, {e}"
+                            )
                     if skip:
                         continue
 
                     body = (
                         '<p><b>%(title)s</b><br/><font size="-1">%(links)s</font></p>'
                         % {
-                            "title": rsscommon.get_title(e),
+                            "title": title,
                             "links": "<br/>".join(
                                 f'<a href="{x}">{html.escape(x)}</a>' for x in links
                             ),
