@@ -42,6 +42,8 @@ class Feeder(base.Feeder):
                     except Exception as e:
                         yield Exception(f"Error from feed {n}: {e}")
                 # save in new scheme
+                etag = getattr(feed, "etag", etag)
+                modified = getattr(feed, "modified", modified)
                 self.resource[url] = {
                     "etag": etag,
                     "modified": modified,
