@@ -69,7 +69,7 @@ class Feeder(base.Feeder):
                 ["git", "log", "--reverse", "--pretty=%H", branch], tmp
             )
             if ret != 0:
-                yield Exception("failed to retrieve Git log of " f"{remote}:\n{stderr}")
+                yield Exception(f"failed to retrieve Git log of {remote}:\n{stderr}")
                 shutil.rmtree(tmp)
                 continue
 
