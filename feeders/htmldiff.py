@@ -15,7 +15,7 @@ class Feeder(base.Feeder):
                 old = []
                 oldurl = "/dev/null"
             try:
-                new = base.download(url).decode("utf-8", "replace").strip().splitlines()
+                new = base.download(url, self.log).decode("utf-8", "replace").strip().splitlines()
             except Exception as e:
                 yield Exception(f"Error while loading {url}: {e}")
                 continue

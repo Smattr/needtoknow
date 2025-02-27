@@ -67,7 +67,7 @@ class Sender:
                 downloaded = 0
                 for img in content.findAll("img", src=re.compile("^https?://")):
                     try:
-                        data = download(img["src"])
+                        data = download(img["src"], log)
                     except (UnicodeEncodeError, urllib.error.URLError):
                         continue
                     downloaded += len(data)

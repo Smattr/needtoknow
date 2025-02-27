@@ -25,7 +25,7 @@ class Feeder(base.Feeder):
                     id = rsscommon.get_id(e)
                     if id not in seen:
                         try:
-                            data = base.download(e.link)
+                            data = base.download(e.link, self.log)
                             yield base.Entry(
                                 n, e.title, data, date=rsscommon.get_date(e), html=True
                             )

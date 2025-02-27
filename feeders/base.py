@@ -30,7 +30,7 @@ class Entry:
         self.files = files or []
 
 
-def download(url):
+def download(url, log):
     RETRIES = 3
     for i in range(RETRIES):
         try:
@@ -38,7 +38,9 @@ def download(url):
             return response.read()
         except urllib.error.URLError as e:
             if i == RETRIES - 1:
+                log.warning(f"download of {url} failed: {e}")
                 raise
+            log.warning(f"download of {url} failed (retrying): {e}")
             if getattr(e, "code", None) == 403:
                 # Some sites explicitly block urllib to prevent crawling (e.g.
                 # Microsoft). Since we're not really a crawler, sidestep this by

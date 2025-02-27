@@ -18,7 +18,7 @@ class Feeder(base.Feeder):
                 oldurl = "/dev/null"
             try:
                 new = (
-                    bs4.BeautifulSoup(base.download(url).strip(), "html.parser")
+                    bs4.BeautifulSoup(base.download(url, self.log).strip(), "html.parser")
                     .get_text()
                     .splitlines()
                 )
