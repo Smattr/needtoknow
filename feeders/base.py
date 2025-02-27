@@ -34,7 +34,7 @@ def download(url, log):
     RETRIES = 3
     for i in range(RETRIES):
         try:
-            response = urllib.request.urlopen(url)
+            response = urllib.request.urlopen(url, timeout=10)
             return response.read()
         except urllib.error.URLError as e:
             if i == RETRIES - 1:
