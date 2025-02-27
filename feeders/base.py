@@ -18,7 +18,7 @@ class Feeder(abc.ABC):
         raise NotImplementedError
 
 
-class Entry(object):
+class Entry:
     def __init__(
         self, name=None, subject=None, content=None, date=None, html=False, files=None
     ):
@@ -47,10 +47,9 @@ def download(url):
                 response = urllib.request.urlopen(request)
                 return response.read()
 
-
 # Sentinel class used by feeders to ask the main logic to write back state to
 # disk. Feeders should use this following processing of each feed. The purpose
 # of this is to minimise the resending of entries when a feeder is interrupted
 # part way through.
-class SyncRequest(object):
+class SyncRequest:
     pass

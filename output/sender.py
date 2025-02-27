@@ -22,7 +22,7 @@ from feeders.base import download
 EMBED_THRESHHOLD = 1024 * 1024 * 15
 
 
-class Sender(object):
+class Sender:
     def __init__(self, conf):
         self.host = str(conf["host"])
         self.port = str(conf.get("port", "993"))
