@@ -85,7 +85,7 @@ class Sender:
                     # still being deterministic.
                     cid = hashlib.sha1(data).hexdigest()
                     images[cid] = att
-                    img["src"] = "cid:%s" % cid
+                    img["src"] = f"cid:{cid}"
                 body = str(content)
 
         m = MIMEMultipart("related")
@@ -113,7 +113,7 @@ class Sender:
 
         # Embed any referenced images.
         for cid, att in images.items():
-            att.add_header("Content-ID", "<%s>" % cid)
+            att.add_header("Content-ID", f"<{cid}>")
             m.attach(att)
 
         m["To"] = "Me" if self.login is None else self.login
@@ -121,7 +121,7 @@ class Sender:
         # has no effect in most email clients, but the GMail web and phone apps
         # insist on labelling such emails "unknown sender".
         if re.search(r"<.+@.+>", entry.name) is None:
-            m["From"] = "%s <example@example.com>" % entry.name
+            m["From"] = f"{entry.name} <example@example.com>"
         else:
             m["From"] = entry.name
         m["Subject"] = entry.subject
