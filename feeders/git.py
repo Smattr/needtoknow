@@ -1,5 +1,4 @@
 import io
-import shutil
 import subprocess
 import tarfile
 import tempfile
@@ -27,94 +26,90 @@ class Feeder(base.Feeder):
             state = self.resource.get((remote, branch))
 
             # Create a temporary directory to work in.
-            tmp = tempfile.mkdtemp()
+            with tempfile.TemporaryDirectory() as tmp:
 
-            if state is None:
-                # This is the first time we've encountered this repository. We
-                # need to clone it.
-                ret, _, stderr = run(
-                    ["git", "clone", "--bare", "--branch", branch, remote, "."], tmp
-                )
-                if ret != 0:
-                    yield Exception(f"failed to clone {remote}:\n{stderr}")
-                    shutil.rmtree(tmp)
-                    continue
+                if state is None:
+                    # This is the first time we've encountered this repository. We need
+                    # to clone it.
+                    ret, _, stderr = run(
+                        ["git", "clone", "--bare", "--branch", branch, remote, "."], tmp
+                    )
+                    if ret != 0:
+                        yield Exception(f"failed to clone {remote}:\n{stderr}")
+                        continue
 
-                last_commit = None
+                    last_commit = None
 
-            else:
-                # We have a previous working directory for this repository. We
-                # need to extract it.
-                last_commit, data = state
+                else:
+                    # We have a previous working directory for this repository. We need
+                    # to extract it.
+                    last_commit, data = state
 
-                buffer = io.BytesIO(data)
-                with tarfile.open(fileobj=buffer) as t:
-                    t.extractall(tmp)
+                    buffer = io.BytesIO(data)
+                    with tarfile.open(fileobj=buffer) as t:
+                        t.extractall(tmp)
 
-                # Update the history in the working directory.
-                ret, _, stderr = run(
-                    ["git", "fetch", remote, f"{branch}:{branch}"], tmp
+                    # update the history in the working directory
+                    ret, _, stderr = run(
+                        ["git", "fetch", remote, f"{branch}:{branch}"], tmp
+                    )
+                    if ret != 0:
+                        yield Exception(
+                            "failed to update temporary working "
+                            f"directory for {remote}:\n{stderr}"
+                        )
+                        continue
+
+                # now retrieve the log and look for new commits
+                ret, stdout, stderr = run(
+                    ["git", "log", "--reverse", "--pretty=%H", branch], tmp
                 )
                 if ret != 0:
                     yield Exception(
-                        "failed to update temporary working "
-                        f"directory for {remote}:\n{stderr}"
+                        f"failed to retrieve Git log of {remote}:\n{stderr}"
                     )
-                    shutil.rmtree(tmp)
                     continue
 
-            # Now retrieve the log and look for new commits.
-            ret, stdout, stderr = run(
-                ["git", "log", "--reverse", "--pretty=%H", branch], tmp
-            )
-            if ret != 0:
-                yield Exception(f"failed to retrieve Git log of {remote}:\n{stderr}")
-                shutil.rmtree(tmp)
-                continue
+                # look for any new commits to this branch
+                seen_last_commit = False
+                for commit in stdout.splitlines():
 
-            # Look for any new commits to this branch.
-            seen_last_commit = False
-            for commit in stdout.splitlines():
+                    if last_commit is None or seen_last_commit:
+                        # this is a new commit
 
-                if last_commit is None or seen_last_commit:
-                    # This is a new commit.
-
-                    ret, summary, stderr = run(
-                        ["git", "log", "-n", "1", "--format=%s", commit], tmp
-                    )
-                    if ret != 0:
-                        yield Exception(
-                            "failed to retrieve summary for Git "
-                            f"commit {commit} of {remote}:\n{stderr}"
+                        ret, summary, stderr = run(
+                            ["git", "log", "-n", "1", "--format=%s", commit], tmp
                         )
-                        continue
+                        if ret != 0:
+                            yield Exception(
+                                "failed to retrieve summary for Git "
+                                f"commit {commit} of {remote}:\n{stderr}"
+                            )
+                            continue
 
-                    ret, diff, stderr = run(["git", "show", commit], tmp)
-                    if ret != 0:
-                        yield Exception(
-                            "failed to retrieve diff for Git "
-                            f"commit {commit} of {remote}:\n{stderr}"
-                        )
-                        continue
+                        ret, diff, stderr = run(["git", "show", commit], tmp)
+                        if ret != 0:
+                            yield Exception(
+                                "failed to retrieve diff for Git "
+                                f"commit {commit} of {remote}:\n{stderr}"
+                            )
+                            continue
 
-                    yield base.Entry(n, summary, diff)
+                        yield base.Entry(n, summary, diff)
 
-                    last_commit = commit
-                    seen_last_commit = True
+                        last_commit = commit
+                        seen_last_commit = True
 
-                elif commit == last_commit:
-                    seen_last_commit = True
+                    elif commit == last_commit:
+                        seen_last_commit = True
 
-            # Tar up the working directory to store in our resources. We don't
-            # bother compressing it because the resources as a whole are
-            # compressed.
-            buffer = io.BytesIO()
-            with tarfile.open(fileobj=buffer, mode="w") as t:
-                for item in Path(tmp).iterdir():
-                    t.add(item, item.name)
-            data = buffer.getvalue()
-
-            shutil.rmtree(tmp)
+                # Tar up the working directory to store in our resources. We do not
+                # bother compressing it because the resources as a whole are compressed.
+                buffer = io.BytesIO()
+                with tarfile.open(fileobj=buffer, mode="w") as t:
+                    for item in Path(tmp).iterdir():
+                        t.add(item, item.name)
+                data = buffer.getvalue()
 
             self.resource[(remote, branch)] = (last_commit, data)
             yield base.SyncRequest()
