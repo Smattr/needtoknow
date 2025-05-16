@@ -9,10 +9,9 @@ from . import base
 
 
 def run(cmd, cwd):
-    p = subprocess.Popen(cmd, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = p.communicate()
-    stdout = stdout.decode("utf-8", "replace")
-    stderr = stderr.decode("utf-8", "replace")
+    p = subprocess.run(cmd, cwd=cwd, capture_output=True, check=False)
+    stdout = p.stdout.decode("utf-8", "replace")
+    stderr = p.stderr.decode("utf-8", "replace")
     return p.returncode, stdout.strip(), stderr.strip()
 
 
