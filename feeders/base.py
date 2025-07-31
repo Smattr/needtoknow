@@ -19,15 +19,12 @@ class Feeder(abc.ABC):
 
 
 class Entry:
-    def __init__(
-        self, name=None, subject=None, content=None, date=None, html=False, files=None
-    ):
+    def __init__(self, name=None, subject=None, content=None, date=None, html=False):
         self.name = name or ""
         self.subject = subject or ""
         self.content = content or ""
         self.date = date
         self.html = html
-        self.files = files or []
 
 
 def download(url, log):
@@ -48,6 +45,7 @@ def download(url, log):
                 request = urllib.request.Request(url, headers={"User-Agent": ""})
                 response = urllib.request.urlopen(request)
                 return response.read()
+
 
 # Sentinel class used by feeders to ask the main logic to write back state to
 # disk. Feeders should use this following processing of each feed. The purpose

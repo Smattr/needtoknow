@@ -1,14 +1,10 @@
 import email
 import hashlib
 import imaplib
-import mimetypes
 import re
 import ssl
 import time
 import urllib.error
-from email import encoders
-from email.mime.audio import MIMEAudio
-from email.mime.base import MIMEBase
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -91,25 +87,6 @@ class Sender:
         m = MIMEMultipart("related")
         part = MIMEText(body, "html" if entry.html else "plain", _charset="utf-8")
         m.attach(part)
-        for name, data in entry.files:
-            content_type, encoding = mimetypes.guess_type(name)
-            if content_type is None or encoding is not None:
-                # Unknown content type or compressed.
-                content_type = "application/octet-stream"
-            type, subtype = content_type.split("/", 1)
-            if type == "text":
-                payload = MIMEText(data, _subtype=subtype)
-            elif type == "image":
-                payload = MIMEImage(data, _subtype=subtype)
-            elif type == "audio":
-                payload = MIMEAudio(data, _subtype=subtype)
-            else:
-                # Unknown content.
-                payload = MIMEBase(type, subtype)
-                payload.set_payload(data)
-                encoders.encode_base64(payload)
-            payload.add_header("Content-Disposition", "attachment", filename=name)
-            m.attach(payload)
 
         # Embed any referenced images.
         for cid, att in images.items():
