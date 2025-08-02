@@ -187,31 +187,31 @@ def main():
     ret = 0
 
     log.info("Looking for updates...")
-    for f in feeders:
+    for name, feeder in feeders.items():
 
         def commit_changes():
             if not opts.dry_run:
                 log.info("  Committing resource changes...")
-                respath = get_resource_path(opts.config, f)
+                respath = get_resource_path(opts.config, name)
                 respath.parent.mkdir(exist_ok=True)
                 tmp = Path(f"{respath}.tmp")
                 with bz2.open(tmp, "wb") as fobj:
-                    pickle.dump(feeders[f].resource, fobj)
+                    pickle.dump(feeder.resource, fobj)
                 tmp.rename(respath)
 
-        if feeders[f] is None:
+        if feeder is None:
             # We failed to load this feeder.
             continue
-        if f in opts.disable or (opts.enable != [] and f not in opts.enable):
+        if name in opts.disable or (opts.enable != [] and name not in opts.enable):
             continue
         try:
-            log.info(f" Scanning {f}...")
-            for entry in feeders[f]:
+            log.info(f" Scanning {name}...")
+            for entry in feeder:
 
                 if isinstance(entry, Exception):
                     if opts.debug:
                         raise entry
-                    log.warning(f"  Feeder '{f}' threw exception: {entry}")
+                    log.warning(f"  Feeder '{name}' threw exception: {entry}")
                     ret = -1
                     continue
                 elif isinstance(entry, SyncRequest):
@@ -220,10 +220,10 @@ def main():
 
                 # Check if we should discard this entry.
                 assert (
-                    entry.name in feeders[f].feeds
-                ), f"feeder '{f}' yielded entry from unknown feed '{entry.name}'"
+                    entry.name in feeder.feeds
+                ), f"feeder '{name}' yielded entry from unknown feed '{entry.name}'"
                 skip = False
-                for blocklist in feeders[f].feeds[entry.name].get("blocklist", []):
+                for blocklist in feeder.feeds[entry.name].get("blocklist", []):
                     try:
                         if re.search(blocklist, entry.subject) is not None:
                             log.info(
@@ -272,7 +272,7 @@ def main():
         except Exception as e:
             if opts.debug:
                 raise
-            log.warning(f"  Feeder '{f}' threw exception: {e}")
+            log.warning(f"  Feeder '{name}' threw exception: {e}")
 
         commit_changes()
 
