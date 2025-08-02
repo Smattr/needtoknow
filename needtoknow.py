@@ -118,7 +118,7 @@ def main():
     # Check whether we're already running, to prevent multiple instances running
     # at once. Multiple running instances can interfere with each other when
     # saving state.
-    me = open(Path(__file__).resolve(), "rt")
+    me = open(Path(__file__).resolve(), "rb")
     try:
         fcntl.flock(me, fcntl.LOCK_EX | fcntl.LOCK_NB)
     except OSError:
