@@ -1,6 +1,8 @@
 import abc
 import urllib.error
 import urllib.request
+from dataclasses import dataclass
+from typing import Optional
 
 
 class Feeder(abc.ABC):
@@ -18,13 +20,13 @@ class Feeder(abc.ABC):
         raise NotImplementedError
 
 
+@dataclass
 class Entry:
-    def __init__(self, name=None, subject=None, content=None, date=None, html=False):
-        self.name = name or ""
-        self.subject = subject or ""
-        self.content = content or ""
-        self.date = date
-        self.html = html
+    name: str
+    subject: str
+    content: str
+    date: Optional[str] = None
+    html: bool = False
 
 
 def download(url, log):
