@@ -33,8 +33,7 @@ def suppress_whitespace(lines):
                 1:
             ].strip() != "":
                 # This is a non-empty change line. Decide to keep this hunk.
-                for a in accumulated:
-                    yield a
+                yield from accumulated
                 accumulated = []
                 state = IDLE
 
