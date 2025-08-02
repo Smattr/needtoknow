@@ -33,8 +33,8 @@ def download(url, log):
     RETRIES = 3
     for i in range(RETRIES):
         try:
-            response = urllib.request.urlopen(url, timeout=10)
-            return response.read()
+            with urllib.request.urlopen(url, timeout=10) as response:
+                return response.read()
         except urllib.error.URLError as e:
             if i == RETRIES - 1:
                 log.warning(f"download of {url} failed: {e}")
@@ -45,8 +45,8 @@ def download(url, log):
                 # Microsoft). Since we're not really a crawler, sidestep this by
                 # twiddling our user agent.
                 request = urllib.request.Request(url, headers={"User-Agent": ""})
-                response = urllib.request.urlopen(request)
-                return response.read()
+                with urllib.request.urlopen(request) as response:
+                    return response.read()
 
 
 # Sentinel class used by feeders to ask the main logic to write back state to
