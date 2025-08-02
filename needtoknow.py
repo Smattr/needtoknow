@@ -214,7 +214,7 @@ def main():
                     log.warning(f"  Feeder '{name}' threw exception: {entry}")
                     ret = -1
                     continue
-                elif isinstance(entry, SyncRequest):
+                if isinstance(entry, SyncRequest):
                     commit_changes()
                     continue
 
