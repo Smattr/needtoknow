@@ -4,6 +4,7 @@ from . import base, diffcommon
 
 
 class Feeder(base.Feeder):
+    """an entry generator that produces HTML-aware diffs between two files"""
     def __iter__(self):
         for n, i in self.feeds.items():
             assert "url" in i

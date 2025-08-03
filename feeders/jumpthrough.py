@@ -4,6 +4,7 @@ from . import base, rsscommon
 
 
 class Feeder(base.Feeder):
+    """an entry generator that produces the content of HTML pages"""
     def __iter__(self):
         for n, i in self.feeds.items():
             assert "url" in i

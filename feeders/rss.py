@@ -2,6 +2,7 @@ from . import base, rsscommon
 
 
 class Feeder(base.Feeder):
+    """an entry generator that produces RSS items"""
     def __iter__(self):
         for n, i in self.feeds.items():
             assert "url" in i

@@ -15,6 +15,7 @@ def run(cmd, cwd):
 
 
 class Feeder(base.Feeder):
+    """an entry generator that produces Git commits"""
     def __iter__(self):
         for n, i in self.feeds.items():
 

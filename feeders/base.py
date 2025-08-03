@@ -6,6 +6,14 @@ from typing import Optional
 
 
 class Feeder(abc.ABC):
+    """
+    common functionality for entry generators
+
+    Args:
+        resource: Feeder-specific data to persist between runs
+        log: Sink for informational and debugging messages
+        debug: Whether we are in debugging mode
+    """
     def __init__(self, resource, log, debug: bool):
         self.resource = resource
         self.feeds = {}
@@ -22,6 +30,16 @@ class Feeder(abc.ABC):
 
 @dataclass
 class Entry:
+    """
+    an item yielded from a feed
+
+    Args:
+        name: The feeder this item originated from
+        subject: Email subject to use when sending
+        content: Body of the item
+        date: Send date to use when sending
+        html: Whether content is HTML or plain text
+    """
     name: str
     subject: str
     content: str
@@ -49,9 +67,9 @@ def download(url, log):
                     return response.read()
 
 
-# Sentinel class used by feeders to ask the main logic to write back state to
-# disk. Feeders should use this following processing of each feed. The purpose
-# of this is to minimise the resending of entries when a feeder is interrupted
-# part way through.
 class SyncRequest:
-    pass
+    """
+    Sentinel class used by feeders to ask the main logic to write back state to disk.
+    Feeders should use this following processing of each feed. The purpose of this is to
+    minimise the resending of entries when a feeder is interrupted part way through.
+    """

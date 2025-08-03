@@ -19,6 +19,14 @@ EMBED_THRESHHOLD = 1024 * 1024 * 15
 
 
 class Sender:
+    """
+    sending agent for feed entries
+
+    This object takes feed entries and appends them to an IMAP mailbox.
+
+    Args:
+        conf: Configuration dict describing how to connect to a mail account.
+    """
     def __init__(self, conf):
         self.host = str(conf["host"])
         self.port = str(conf.get("port", "993"))

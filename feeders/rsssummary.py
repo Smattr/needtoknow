@@ -6,6 +6,10 @@ from . import base, rsscommon
 
 
 class Feeder(base.Feeder):
+    """
+    an entry generator that accumulates the titles and an optional summary of RSS items
+    into a single entry
+    """
     def __iter__(self):
         for n, i in self.feeds.items():
             assert "url" in i
