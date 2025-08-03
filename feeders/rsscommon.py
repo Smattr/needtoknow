@@ -34,24 +34,24 @@ def get_entries(response):
 def get_id(entry):
     try:
         return entry.id
-    except:
+    except:  # pylint: disable=bare-except
         return entry.title
 
 
 def get_content(entry):
     try:
         return entry.content[0].value
-    except:
+    except:  # pylint: disable=bare-except
         try:
             return entry.description
-        except:
+        except:  # pylint: disable=bare-except
             return ""
 
 
 def get_date(entry):
     try:
         return entry.updated_parsed
-    except:
+    except:  # pylint: disable=bare-except
         return None
 
 
@@ -59,12 +59,12 @@ def get_links(entry):
     l = set()
     try:
         l.add(entry.link)
-    except:
+    except:  # pylint: disable=bare-except
         pass
     try:
         for link in entry.links:
             l.add(link.url)
-    except:
+    except:  # pylint: disable=bare-except
         pass
     return l
 
@@ -73,6 +73,6 @@ def get_title(entry):
     try:
         if entry.title_detail.type == "text/html":
             return entry.title_detail.value
-    except:
+    except:  # pylint: disable=bare-except
         pass
     return html.escape(entry.title)

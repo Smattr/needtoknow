@@ -47,11 +47,11 @@ class Sender:
         if self.conn:
             try:
                 self.conn.close()
-            except:
+            except:  # pylint: disable=bare-except
                 pass
             try:
                 self.conn.logout()
-            except:
+            except:  # pylint: disable=bare-except
                 pass
         self.conn = None
 
@@ -65,7 +65,7 @@ class Sender:
             content = None
             try:
                 content = bs4.BeautifulSoup(entry.content, "html.parser")
-            except:
+            except:  # pylint: disable=bare-except
                 pass
             if content is not None:
                 downloaded = 0
