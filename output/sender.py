@@ -115,7 +115,7 @@ class Sender:
             m["Date"] = email.utils.formatdate(stamp)
         else:
             stamp = time.time()
-        log.info('  Sending "%s"...' % entry.subject)
+        log.info(f'  Sending "{entry.subject}"...')
         self.conn.append(
             "INBOX" if self.folder is None else self.folder,
             "",
