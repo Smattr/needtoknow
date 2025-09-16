@@ -22,8 +22,8 @@ class Feeder(base.Feeder):
                 entries = rsscommon.get_entries(feed)
                 for e in entries:
                     try:
-                        id = rsscommon.get_id(e)
-                        if id not in seen:
+                        ident = rsscommon.get_id(e)
+                        if ident not in seen:
                             links = rsscommon.get_links(e)
                             yield base.Entry(
                                 n,
@@ -39,7 +39,7 @@ class Feeder(base.Feeder):
                                 date=rsscommon.get_date(e),
                                 html=True,
                             )
-                            seen.append(id)
+                            seen.append(ident)
                     except Exception as e:
                         yield Exception(f"Error from feed {n}: {e}")
                 # save in new scheme

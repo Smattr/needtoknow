@@ -23,8 +23,8 @@ class Feeder(base.Feeder):
                 feed = rsscommon.get_feed(url, etag, modified)
                 entries = rsscommon.get_entries(feed)
                 for e in entries:
-                    id = rsscommon.get_id(e)
-                    if id not in seen:
+                    ident = rsscommon.get_id(e)
+                    if ident not in seen:
                         try:
                             data = base.download(e.link, self.log)
                             yield base.Entry(
@@ -33,7 +33,7 @@ class Feeder(base.Feeder):
                         except urllib.error.HTTPError:
                             # Suppress 404s from broken links.
                             pass
-                        seen.append(id)
+                        seen.append(ident)
                 # save in new scheme
                 self.resource[url] = {
                     "etag": etag,
