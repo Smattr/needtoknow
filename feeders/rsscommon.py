@@ -18,6 +18,11 @@ def get_feed(url, etag=None, modified=None):
 
     response = feedparser.parse(url, **kwargs)
 
+    if response.get("bozo"):
+        raise RuntimeError(f"{url} returned invalid XML") from response[
+            "bozo_exception"
+        ]
+
     if getattr(response, "status", None) == 304:  # “Not Modified”
         response.etag = etag
         response.modified = modified
