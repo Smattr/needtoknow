@@ -18,10 +18,13 @@ def get_feed(url, etag=None, modified=None):
 
     response = feedparser.parse(url, **kwargs)
 
-    if response.get("bozo"):
-        raise RuntimeError(f"{url} returned invalid XML") from response[
-            "bozo_exception"
-        ]
+    # detect invalid feeds, but let a lack of Content-type header pass because we still
+    # get valid data we can interpret
+    # (hello https://yosefk.com/blog/feed)
+    if response.get("bozo") and not isinstance(
+        response["bozo_exception"], feedparser.NonXMLContentType
+    ):
+        raise RuntimeError(f"{url} returned invalid XML: {response['bozo_exception']}")
 
     if getattr(response, "status", None) == 304:  # “Not Modified”
         response.etag = etag
