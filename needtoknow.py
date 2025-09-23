@@ -17,7 +17,7 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
-from feeders.base import SyncRequest
+from feeders.base import Entry, SyncRequest
 from output import sender
 
 # How many times to attempt reconnecting to our output mailbox when the
@@ -213,17 +213,15 @@ def main():
                         raise entry
                     log.warning(f"  Feeder '{name}' threw exception: {entry}")
                     ret = -1
-                    continue
+                    # reconstruct the exception as something to send
+                    entry = Entry(name, "Processing error", str(entry))
                 if isinstance(entry, SyncRequest):
                     commit_changes()
                     continue
 
                 # Check if we should discard this entry.
-                assert (
-                    entry.name in feeder.feeds
-                ), f"feeder '{name}' yielded entry from unknown feed '{entry.name}'"
                 skip = False
-                for blocklist in feeder.feeds[entry.name].get("blocklist", []):
+                for blocklist in feeder.feeds.get(entry.name, {}).get("blocklist", []):
                     try:
                         if re.search(blocklist, entry.subject) is not None:
                             log.info(
