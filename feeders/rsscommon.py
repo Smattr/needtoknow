@@ -8,6 +8,27 @@ import html
 import feedparser
 
 
+def check(url: str, response) -> None:
+    """validate response to a feed request"""
+
+    if not response.get("bozo"):
+        return
+
+    # let a lack of Content-type header pass because we still get valid data we
+    # can interpret
+    # (hello https://yosefk.com/blog/feed)
+    if isinstance(response["bozo_exception"], feedparser.NonXMLContentType):
+        return
+
+    # let character encoding mistakes pass because we still get valid data we
+    # can interpret
+    # (hello https://pwy.io/feed.xml)
+    if isinstance(response["bozo_exception"], feedparser.CharacterEncodingOverride):
+        return
+
+    raise RuntimeError(f"{url} returned invalid XML: {response['bozo_exception']}")
+
+
 def get_feed(url, etag=None, modified=None):
 
     kwargs = {}
@@ -18,13 +39,7 @@ def get_feed(url, etag=None, modified=None):
 
     response = feedparser.parse(url, **kwargs)
 
-    # detect invalid feeds, but let a lack of Content-type header pass because we still
-    # get valid data we can interpret
-    # (hello https://yosefk.com/blog/feed)
-    if response.get("bozo") and not isinstance(
-        response["bozo_exception"], feedparser.NonXMLContentType
-    ):
-        raise RuntimeError(f"{url} returned invalid XML: {response['bozo_exception']}")
+    check(url, response)
 
     if getattr(response, "status", None) == 304:  # “Not Modified”
         response.etag = etag
