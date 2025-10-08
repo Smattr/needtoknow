@@ -27,6 +27,7 @@ class Sender:
     Args:
         conf: Configuration dict describing how to connect to a mail account.
     """
+
     def __init__(self, conf):
         self.host = str(conf["host"])
         self.port = str(conf.get("port", "993"))
