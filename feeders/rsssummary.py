@@ -28,8 +28,8 @@ class Feeder(base.Feeder):
             entries = rsscommon.get_entries(feed)
             content = []
             for e in entries:
-                id = rsscommon.get_id(e)
-                if id not in seen:
+                ident = rsscommon.get_id(e)
+                if ident not in seen:
                     links = rsscommon.get_links(e)
 
                     # do any of the links match something the user wanted to
@@ -87,7 +87,7 @@ class Feeder(base.Feeder):
                             flags=re.MULTILINE,
                         )
                     content.append(body)
-                    seen.append(id)
+                    seen.append(ident)
             if len(content) > 0:
                 yield base.Entry(
                     n,
