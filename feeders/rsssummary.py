@@ -10,6 +10,7 @@ class Feeder(base.Feeder):
     an entry generator that accumulates the titles and an optional summary of RSS items
     into a single entry
     """
+
     def __iter__(self):
         for n, i in self.feeds.items():
             assert "url" in i
@@ -45,7 +46,9 @@ class Feeder(base.Feeder):
                         try:
                             self.log.debug(f"  checking {title} against regex {block}")
                             if re.search(block, title) is not None:
-                                self.log.info(f"  Discarding [{n}] {title} as blocklisted")
+                                self.log.info(
+                                    f"  Discarding [{n}] {title} as blocklisted"
+                                )
                                 skip = True
                                 break
                         except Exception as e:
