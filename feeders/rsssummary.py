@@ -31,7 +31,7 @@ class Feeder(base.Feeder):
             for e in entries:
                 ident = rsscommon.get_id(e)
                 if ident not in seen:
-                    links = rsscommon.get_links(e)
+                    links = rsscommon.get_links(e, i.get("ignore_urls"))
 
                     # do any of the links match something the user wanted to
                     # suppress?
@@ -60,19 +60,6 @@ class Feeder(base.Feeder):
                             )
                     if skip:
                         continue
-
-                    # skip any specific links the user wanted to suppress
-                    if len(links) > 0:
-                        ls = []
-                        for l in links:
-                            if any(
-                                re.search(regex, l)
-                                for regex in i.get("ignore_urls", [])
-                            ):
-                                self.log.info(f"  Discarding link {l} as ignored")
-                            else:
-                                ls += [l]
-                        links = ls
 
                     body = (
                         '<p><b>%(title)s</b><br/><font size="-1">%(links)s</font></p>'

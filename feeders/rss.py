@@ -3,6 +3,7 @@ from . import base, rsscommon
 
 class Feeder(base.Feeder):
     """an entry generator that produces RSS items"""
+
     def __iter__(self):
         for n, i in self.feeds.items():
             assert "url" in i
@@ -24,7 +25,7 @@ class Feeder(base.Feeder):
                     try:
                         ident = rsscommon.get_id(e)
                         if ident not in seen:
-                            links = rsscommon.get_links(e)
+                            links = rsscommon.get_links(e, i.get("ignore_urls"))
                             yield base.Entry(
                                 n,
                                 e.title,

@@ -4,6 +4,8 @@ imported as a standalone feeder.
 """
 
 import html
+import re
+from typing import List, Optional
 
 import feedparser
 
@@ -78,18 +80,19 @@ def get_date(entry):
         return None
 
 
-def get_links(entry):
-    l = set()
+def get_links(entry, ignore_urls: Optional[List[str]] = None):
+    if ignore_urls is None:
+        ignore_urls = []
+    l = []
     try:
-        l.add(entry.link)
+        l += [entry.link]
     except:  # pylint: disable=bare-except
         pass
     try:
-        for link in entry.links:
-            l.add(link.url)
+        l += [link.url for link in entry.links]
     except:  # pylint: disable=bare-except
         pass
-    return l
+    return set(x for x in l if not any(re.search(r, x) for r in ignore_urls))
 
 
 def get_title(entry):
