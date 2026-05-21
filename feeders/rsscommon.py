@@ -39,7 +39,20 @@ def get_feed(url, etag=None, modified=None):
     if modified is not None:
         kwargs["modified"] = modified
 
-    response = feedparser.parse(url, **kwargs)
+    # XXX: Google Project Zero serves a feed that exceeds the default SAX parser limits
+    # and claims to be ASCII but includes UTF-8 characters. Work around this by forcing
+    # use of expat and UTF-8 interpretation.
+    backend = feedparser.api.PREFERRED_XML_PARSERS
+    if url == "https://projectzero.google/feed.xml":
+        feedparser.api.PREFERRED_XML_PARSERS = ()
+        kwargs["response_headers"] = {
+            "content-type": "application/rss+xml; charset=UTF-8"
+        }
+
+    try:
+        response = feedparser.parse(url, **kwargs)
+    finally:
+        feedparser.api.PREFERRED_XML_PARSERS = backend
 
     check(url, response)
 
