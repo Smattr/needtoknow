@@ -5,7 +5,8 @@ imported as a standalone feeder.
 
 import html
 import re
-from typing import List, Optional
+from pathlib import Path
+from typing import List, Optional, Union
 
 import feedparser
 
@@ -93,6 +94,11 @@ def get_date(entry):
         return None
 
 
+def is_image(url: Union[Path, str]) -> bool:
+    """is this link to an image?"""
+    return Path(url).suffix.lower() in (".gif", ".jpeg", ".jpg", ".png", ".webp")
+
+
 def get_links(entry, ignore_urls: Optional[List[str]] = None):
     if ignore_urls is None:
         ignore_urls = []
@@ -105,6 +111,8 @@ def get_links(entry, ignore_urls: Optional[List[str]] = None):
         l += [link.url for link in entry.links]
     except:  # pylint: disable=bare-except
         pass
+    if len(l) > 1 and any(not is_image(u) for u in l):
+        l = [u for u in l if not is_image(u)]
     return set(x for x in l if not any(re.search(r, x) for r in ignore_urls))
 
 
